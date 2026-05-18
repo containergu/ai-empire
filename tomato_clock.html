@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tomato Clock</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    background: linear-gradient(165deg, #2a4d6e 0%, #1a2f4a 45%, #121f32 100%);
+    color: #d8e4f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    user-select: none;
+  }
+  .container {
+    background: rgba(36, 63, 94, 0.92);
+    border: 1px solid rgba(107, 158, 196, 0.2);
+    border-radius: 24px;
+    padding: 40px 48px;
+    width: 400px;
+    box-shadow: 0 20px 60px rgba(8, 18, 32, 0.55);
+    text-align: center;
+  }
+  .tomato-icon { font-size: 56px; margin-bottom: 4px; }
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #e8f0f8;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+  .mode-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    transition: color 0.3s;
+  }
+  .mode-label.work { color: #e8b88a; }
+  .mode-label.break { color: #8ec5e8; }
+  .timer {
+    font-size: 80px;
+    font-weight: 700;
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+  .progress-track {
+    width: 100%;
+    height: 6px;
+    background: #122a42;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #6b9ec4, #4a7a9e);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+  .progress-fill.work { background: linear-gradient(90deg, #e8b88a, #c9956a); }
+  .progress-fill.break { background: linear-gradient(90deg, #8ec5e8, #6b9ec4); }
+  .controls { display: flex; gap: 12px; margin-bottom: 28px; }
+  .btn {
+    flex: 1;
+    padding: 14px 0;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #fff;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-start {
+    background: #5b8fb8;
+    box-shadow: 0 4px 15px rgba(91, 143, 184, 0.35);
+  }
+  .btn-start:hover { background: #4a7da8; }
+  .btn-start.paused { background: #ffa726; box-shadow: 0 4px 15px rgba(255, 167, 38, 0.3); }
+  .btn-start.paused:hover { background: #f09700; }
+  .btn-reset {
+    background: #6c757d;
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.2);
+    flex: 0.5;
+  }
+  .btn-reset:hover { background: #5a6268; }
+  .settings {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .setting-group { display: flex; align-items: center; gap: 8px; }
+  .setting-group label {
+    font-size: 13px;
+    color: #aaa;
+  }
+  .setting-group input {
+    width: 52px;
+    padding: 6px 8px;
+    background: #122a42;
+    border: 1px solid #2d4f6e;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    text-align: center;
+    outline: none;
+  }
+  .setting-group input:focus { border-color: #6b9ec4; }
+  .stats {
+    padding-top: 16px;
+    border-top: 1px solid #2d4f6e;
+    font-size: 14px;
+    color: #8aa8c4;
+  }
+  .stats span { color: #8ec5e8; font-weight: 600; }
+  .shortcuts {
+    margin-top: 12px;
+    font-size: 11px;
+    color: #555;
+  }
+  .shortcuts kbd {
+    background: #122a42;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 11px;
+    color: #888;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="tomato-icon">🍅</div>
+  <h1>Tomato Clock</h1>
+
+  <div class="mode-label work" id="modeLabel">WORK</div>
+  <div class="timer" id="timerDisplay">25:00</div>
+
+  <div class="progress-track">
+    <div class="progress-fill work" id="progressFill"></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-start" id="startBtn">▶ Start</button>
+    <button class="btn btn-reset" id="resetBtn">↺</button>
+  </div>
+
+  <div class="settings">
+    <div class="setting-group">
+      <label for="workMin">Work</label>
+      <input type="number" id="workMin" value="25" min="1" max="120">
+      <label>min</label>
+    </div>
+    <div class="setting-group">
+      <label for="breakMin">Break</label>
+      <input type="number" id="breakMin" value="5" min="1" max="60">
+      <label>min</label>
+    </div>
+  </div>
+
+  <div class="stats">
+    🍅 Today: <span id="sessionCount">0</span> session(s) completed
+  </div>
+  <div class="shortcuts">
+    <kbd>Space</kbd> Start/Pause &nbsp;·&nbsp; <kbd>R</kbd> Reset
+  </div>
+</div>
+
+<script>
+(function () {
+  // ── state ──
+  const MODE = { WORK: 'work', BREAK: 'break' };
+  let workMin = 25;
+  let breakMin = 5;
+  let mode = MODE.WORK;
+  let remaining = workMin * 60;
+  let running = false;
+  let paused = false;
+  let startTime = null;
+  let timerId = null;
+  let sessionsToday = 0;
+
+  // single AudioContext reused across beeps
+  let audioCtx = null;
+
+  // ── DOM refs ──
+  const timerEl = document.getElementById('timerDisplay');
+  const modeLabel = document.getElementById('modeLabel');
+  const progressFill = document.getElementById('progressFill');
+  const startBtn = document.getElementById('startBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const workInput = document.getElementById('workMin');
+  const breakInput = document.getElementById('breakMin');
+  const sessionCount = document.getElementById('sessionCount');
+
+  // ── audio ──
+  function ensureAudioCtx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioCtx;
+  }
+
+  function beep() {
+    try {
+      const ctx = ensureAudioCtx();
+      [880, 660].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.value = 0.3;
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + i * 0.2);
+        osc.stop(ctx.currentTime + i * 0.2 + 0.5);
+      });
+    } catch (_) {}
+  }
+
+  // ── helpers ──
+  function totalSecs() {
+    return mode === MODE.WORK ? workMin * 60 : breakMin * 60;
+  }
+
+  function formatTime(s) {
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+  }
+
+  function getToday() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function setModeUI(m) {
+    const isWork = m === MODE.WORK;
+    modeLabel.textContent = isWork ? 'WORK' : 'BREAK';
+    modeLabel.className = 'mode-label ' + (isWork ? 'work' : 'break');
+    progressFill.className = 'progress-fill ' + (isWork ? 'work' : 'break');
+  }
+
+  function notify(title, body) {
+    if (Notification.permission === 'granted') {
+      new Notification(title, { body });
+    }
+  }
+
+  function updateDisplay(total) {
+    const next = formatTime(remaining);
+    if (timerEl.textContent !== next) timerEl.textContent = next;
+    const pct = total > 0 ? ((total - remaining) / total) * 100 : 0;
+    progressFill.style.width = `${pct}%`;
+  }
+
+  function updateStats() {
+    sessionCount.textContent = sessionsToday;
+    try {
+      localStorage.setItem('tomato_stats',
+        JSON.stringify({ date: getToday(), sessions: sessionsToday }));
+    } catch (_) {}
+  }
+
+  function loadStats() {
+    try {
+      const raw = localStorage.getItem('tomato_stats');
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data.date === getToday() && typeof data.sessions === 'number') {
+          sessionsToday = data.sessions;
+        }
+      }
+    } catch (_) {}
+    updateStats();
+  }
+
+  function readSettings() {
+    const w = parseInt(workInput.value, 10);
+    const b = parseInt(breakInput.value, 10);
+    if (isNaN(w) || w < 1) { workInput.value = workMin; return false; }
+    if (isNaN(b) || b < 1) { breakInput.value = breakMin; return false; }
+    workMin = w;
+    breakMin = b;
+    return true;
+  }
+
+  // ── timer logic ──
+  function tick() {
+    if (!running || paused) return;
+
+    const elapsed = (Date.now() - startTime) / 1000;
+    const total = totalSecs();
+    remaining = Math.max(0, total - elapsed);
+    updateDisplay(total);
+
+    if (remaining <= 0) {
+      timerDone();
+      return;
+    }
+
+    timerId = setTimeout(tick, 200);
+  }
+
+  function startTimer() {
+    if (running) return;
+    if (!readSettings()) return;
+
+    mode = MODE.WORK;
+    remaining = totalSecs();
+    setModeUI(mode);
+    running = true;
+    paused = false;
+    startTime = Date.now();
+    startBtn.textContent = '⏸ Pause';
+    startBtn.classList.add('paused');
+    tick();
+  }
+
+  function togglePause() {
+    if (!running) return;
+    if (paused) {
+      paused = false;
+      startTime = Date.now() - (totalSecs() - remaining) * 1000;
+      startBtn.textContent = '⏸ Pause';
+      tick();
+    } else {
+      paused = true;
+      startBtn.textContent = '▶ Resume';
+    }
+  }
+
+  function timerDone() {
+    beep();
+
+    if (mode === MODE.WORK) {
+      sessionsToday++;
+      updateStats();
+      mode = MODE.BREAK;
+      remaining = breakMin * 60;
+      notify('Work Done! 🍅', `${sessionsToday} session(s) complete! Take a ${breakMin}-min break.`);
+    } else {
+      mode = MODE.WORK;
+      remaining = workMin * 60;
+      notify('Break Over! 💪', 'Back to work!');
+    }
+
+    setModeUI(mode);
+    running = false;
+    paused = false;
+    startTime = null;
+    startBtn.textContent = '▶ Start';
+    startBtn.classList.remove('paused');
+    updateDisplay(totalSecs());
+  }
+
+  function resetTimer() {
+    running = false;
+    paused = false;
+    startTime = null;
+    if (timerId) { clearTimeout(timerId); timerId = null; }
+    readSettings();
+    mode = MODE.WORK;
+    remaining = workMin * 60;
+    setModeUI(mode);
+    startBtn.textContent = '▶ Start';
+    startBtn.classList.remove('paused');
+    updateDisplay(totalSecs());
+  }
+
+  // ── events ──
+  startBtn.addEventListener('click', () => {
+    if (!running) { startTimer(); }
+    else { togglePause(); }
+  });
+
+  resetBtn.addEventListener('click', resetTimer);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.code === 'Space') { e.preventDefault(); startBtn.click(); }
+    if (e.code === 'KeyR') { resetTimer(); }
+  });
+
+  // request notification permission
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+
+  // ── init ──
+  loadStats();
+  updateDisplay();
+})();
+</script>
+</body>
+</html>
