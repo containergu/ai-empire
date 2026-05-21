@@ -1,0 +1,27 @@
+{
+  "user": {
+    "name": "George",
+    "title": "Finance Professor",
+    "location": "Portland, Oregon, USA",
+    "language": "zh-CN"
+  },
+  "discord": {
+    "news_webhook": "https://discord.com/api/webhooks/1506332206899925145/9BrMar7g0MR_ALs91DdogDZ0YJRRFu9GX19a3X8Pjcdj8OmuilOoJ1COXUJncTiYSqTc",
+    "daily_webhook": "https://discord.com/api/webhooks/1506332206899925145/9BrMar7g0MR_ALs91DdogDZ0YJRRFu9GX19a3X8Pjcdj8OmuilOoJ1COXUJncTiYSqTc"
+  },
+  "wechat": {
+    "serverchan_key": "SCT351936TmwbnTYaoS4LfanIyoMm5qwb7"
+  },
+  "fitness": {
+    "goal": "",
+    "target_weight_kg": null
+  },
+  "weather": {
+    "city": "Shanghai"
+  },
+  "news": {
+    "sources": ["华尔街见闻", "财新网", "FT中文网", "36氪"],
+    "categories": ["宏观经济", "A股", "美股", "产业", "政策"],
+    "max_articles": 10
+  }
+}

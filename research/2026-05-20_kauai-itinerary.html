@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>可爱岛行程规划 Kauai Itinerary · May 22–26, 2026</title>
+<style>
+  :root {
+    --ocean: #006994;
+    --sand: #f5e6ca;
+    --sunset: #e6735a;
+    --leaf: #3a7d44;
+    --sky: #e8f4f8;
+    --card-bg: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'SF Pro', 'Noto Sans SC', 'Segoe UI', sans-serif;
+    background: var(--sand);
+    color: #2c2c2c;
+    line-height: 1.6;
+  }
+  .header {
+    background: linear-gradient(135deg, var(--ocean) 0%, #004d6e 100%);
+    color: white;
+    padding: 2.5rem 1rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '🏝️';
+    position: absolute;
+    right: -10px;
+    bottom: -20px;
+    font-size: 120px;
+    opacity: 0.1;
+  }
+  .header h1 { font-size: 2rem; margin-bottom: 0.3rem; }
+  .header p { opacity: 0.9; font-size: 0.95rem; }
+  .header .meta { margin-top: 0.8rem; font-size: 0.85rem; opacity: 0.8; }
+  .container { max-width: 900px; margin: 0 auto; padding: 0 1rem; }
+
+  .section { margin: 1.5rem 0; }
+  .card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .card h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid var(--ocean);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .card h3 {
+    font-size: 1.1rem;
+    margin: 1.2rem 0 0.8rem;
+    color: var(--ocean);
+  }
+  .card h3:first-of-type { margin-top: 0; }
+
+  .badge {
+    display: inline-block;
+    background: var(--sunset);
+    color: white;
+    padding: 0.15rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge.booked { background: var(--sunset); }
+  .badge.confirmed { background: var(--leaf); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  table th {
+    background: var(--sky);
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    font-weight: 600;
+    color: var(--ocean);
+  }
+  table td {
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+  }
+  table tr:last-child td { border-bottom: none; }
+  .table-wrap { overflow-x: auto; }
+
+  .day-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+  }
+  .day-header .date {
+    background: var(--ocean);
+    color: white;
+    padding: 0.2rem 0.8rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .day-header .theme {
+    font-weight: 600;
+    color: #555;
+  }
+  .day-header .booked-icon { font-size: 1.2rem; }
+
+  .route-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+    margin-top: 0.8rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--sky);
+    border-radius: 8px;
+    font-size: 0.85rem;
+  }
+  .route-bar .arrow { color: var(--ocean); font-weight: bold; margin: 0 0.1rem; }
+
+  .tip {
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    padding: 0.7rem 1rem;
+    margin: 0.8rem 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.88rem;
+  }
+  .tip strong:first-child { margin-right: 0.3rem; }
+
+  .booked-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .booked-table .check { color: var(--leaf); font-weight: bold; }
+
+  .food-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+  .food-item {
+    padding: 0.5rem 0.7rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+    font-size: 0.88rem;
+  }
+  .food-item .meal { font-weight: 600; color: var(--ocean); display: block; font-size: 0.78rem; }
+  .food-item .status { color: var(--sunset); font-weight: 600; font-size: 0.82rem; }
+
+  .reminder-list { padding-left: 1.2rem; }
+  .reminder-list li { margin-bottom: 0.4rem; font-size: 0.9rem; }
+  .reminder-list li::marker { color: var(--ocean); }
+
+  .footer {
+    text-align: center;
+    padding: 1.5rem;
+    color: #888;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 600px) {
+    .header h1 { font-size: 1.5rem; }
+    .card { padding: 1rem; }
+    table { font-size: 0.82rem; }
+    table th, table td { padding: 0.4rem 0.4rem; }
+    .food-grid { grid-template-columns: 1fr; }
+    .route-bar { font-size: 0.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏝️ 可爱岛行程规划</h1>
+  <p>Kauai Itinerary · May 22–26, 2026</p>
+  <div class="meta">
+    4 Adults + 1 Child (Robin) · Waipouli Beach Resorts · Thrifty Rental · Alaska Airlines
+  </div>
+</div>
+
+<div class="container">
+
+<!-- Booked Items -->
+<div class="section">
+  <div class="card">
+    <h2>✅ 已定项目 (Already Booked)</h2>
+    <div class="table-wrap">
+      <table class="booked-table">
+        <tr><td>去程航班</td><td>AS 282 PDX→LIH, May 22 7:44am</td></tr>
+        <tr><td>回程航班</td><td>AS 264 LIH→PDX, May 26 3:02–8:37pm</td></tr>
+        <tr><td>租车</td><td>Thrifty — Pick up May 22 11:45am / Drop off May 26 10:30am</td></tr>
+        <tr><td>宾馆</td><td>Waipouli Beach Resorts, 4 nights, Check-in 3PM / Check-out 11AM</td></tr>
+        <tr><td>Kilauea Point</td><td>May 22 (Fri) 3:00–3:45PM, 4张票已预约 <span class="badge confirmed">Booked</span></td></tr>
+        <tr><td>The Plantation House</td><td>May 23 (Sat) 7:00PM, Party of 5 (Kilohana) <span class="badge confirmed">Booked</span></td></tr>
+        <tr><td>Duke's Kauai</td><td>May 25 (Mon) 6:30PM, Party of 5 <span class="badge confirmed">Booked</span></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Day 1 -->
+<div class="section">
+  <div class="card">
+    <div class="day-header">
+      <span class="date">DAY 1 · 5/22 Fri</span>
+      <span class="theme">到达日 · 北端灯塔</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>时间</th><th>活动</th><th>备注</th></tr>
+        <tr><td>7:44 AM</td><td>PDX出发 → Lihue</td><td>飞行约6h，时差-3h</td></tr>
+        <tr><td>~11:40 AM</td><td>到达Lihue机场</td><td>取行李</td></tr>
+        <tr><td>11:45 AM</td><td><strong>Thrifty取车</strong></td><td>机场旁</td></tr>
+        <tr><td>12:00–1:00 PM</td><td>午餐 → 去宾馆方向</td><td>East side沿途餐厅</td></tr>
+        <tr><td>1:00–2:30 PM</td><td><strong>Lydgate Park</strong> 浮潜/游乐场</td><td>离宾馆5分钟，安全浮潜+游乐场</td></tr>
+        <tr><td>3:00 PM</td><td><strong>宾馆Check-in</strong></td><td>Waipouli Beach Resorts</td></tr>
+        <tr><td>3:00–3:45 PM</td><td><strong>Kilauea Point</strong> 🎯已预约</td><td>北端灯塔，开车30min</td></tr>
+        <tr><td>4:00–5:00 PM</td><td>继续向北到Kilauea Town</td><td>Kilauea Fish Market (鱼Taco)</td></tr>
+        <tr><td>6:00 PM</td><td>回宾馆休息/晚餐</td><td>对面Safeway/餐厅</td></tr>
+      </table>
+    </div>
+    <div class="route-bar">
+      🗺️ <span class="arrow">→</span> 机场 <span class="arrow">→</span> Lydgate Park <span class="arrow">→</span> Kilauea Point
+    </div>
+    <div class="tip"><strong>🍽 午餐推荐:</strong> Hamura Saimin (Lihue，现金) / Mark's Place (Loco Moco)</div>
+  </div>
+</div>
+
+<!-- Day 2 -->
+<div class="section">
+  <div class="card">
+    <div class="day-header">
+      <span class="date">DAY 2 · 5/23 Sat</span>
+      <span class="theme">南岸 · 咖啡 · 种植园</span>
+      <span class="booked-icon">🎯</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>时间</th><th>活动</th><th>备注</th></tr>
+        <tr><td>8:30–9:30 AM</td><td><strong>Kauaʻi Coffee Company</strong> ☕</td><td>免费品鉴，周六10AM开门</td></tr>
+        <tr><td>10:00–11:30 AM</td><td><strong>Poipu Park</strong> 浮潜</td><td>安全海湾，看绿海龟</td></tr>
+        <tr><td>11:30 AM–12:30 PM</td><td><strong>Puka Dog</strong> 热狗午餐</td><td>全美十佳热狗</td></tr>
+        <tr><td>12:30–1:30 PM</td><td><strong>Spouting Horn Park</strong></td><td>天然喷水口，免费</td></tr>
+        <tr><td>2:00–4:00 PM</td><td><strong>Kilohana Train Ride</strong> 🚂</td><td>喂动物+Koloa Rum免费品酒</td></tr>
+        <tr><td>4:00–6:00 PM</td><td>回宾馆休息/泳池</td><td>Lazy River!</td></tr>
+        <tr><td><strong>7:00 PM</strong></td><td><strong>The Plantation House</strong> 🎯已订</td><td>Kilohana内，Party of 5</td></tr>
+      </table>
+    </div>
+    <div class="route-bar">
+      🗺️ <span class="arrow">→</span> Coffee Co <span class="arrow">→</span> Poipu <span class="arrow">→</span> Spouting Horn <span class="arrow">→</span> Kilohana
+    </div>
+    <div class="tip"><strong>🍽 午餐备选:</strong> Keoki's Paradise (Poipu, 丛林秘境风格)</div>
+    <div class="tip"><strong>💡 经过:</strong> Tree Tunnel (520公路桉树隧道，摇下车窗)</div>
+  </div>
+</div>
+
+<!-- Day 3 -->
+<div class="section">
+  <div class="card">
+    <div class="day-header">
+      <span class="date">DAY 3 · 5/24 Sun</span>
+      <span class="theme">西岸 · 大峡谷 · 悬崖</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>时间</th><th>活动</th><th>备注</th></tr>
+        <tr><td>7:30–8:30 AM</td><td>出发前往Waimea</td><td>车程约1h</td></tr>
+        <tr><td>8:30–10:30 AM</td><td><strong>Waimea Canyon</strong> 🏔️</td><td>Pu'u Hinahina + Canyon Lookout</td></tr>
+        <tr><td>10:30–11:30 AM</td><td><strong>Kōkeʻe State Park</strong> — Kalalau Lookout</td><td>俯瞰Na Pali海岸</td></tr>
+        <tr><td>11:30 AM–12:00 PM</td><td><strong>Pu'u O Kila Lookout</strong></td><td>再往下开4分钟</td></tr>
+        <tr><td>12:00–1:00 PM</td><td>车上午餐/野餐</td><td>自带食物</td></tr>
+        <tr><td>1:00–2:00 PM</td><td><strong>Hanapepe Swinging Bridge</strong> 🌉</td><td>《星际宝贝》小镇</td></tr>
+        <tr><td>2:00–2:30 PM</td><td><strong>Lappert's Ice Cream</strong> 🍦</td><td>神级冰淇淋</td></tr>
+        <tr><td>3:00–5:00 PM</td><td>回宾馆休息/泳池</td><td></td></tr>
+        <tr><td>6:00 PM</td><td>晚餐</td><td>推荐宾馆附近</td></tr>
+      </table>
+    </div>
+    <div class="route-bar">
+      🗺️ <span class="arrow">→</span> Waimea Canyon <span class="arrow">→</span> Kokee <span class="arrow">→</span> Hanapepe
+    </div>
+    <div class="tip"><strong>🍽 晚餐推荐:</strong> Little Fatties (Kapaa, 4.9星, Carnitas Taco)</div>
+    <div class="tip"><strong>💡 提示:</strong> 建议自带午餐在车上解决，边走边吃省时间</div>
+  </div>
+</div>
+
+<!-- Day 4 -->
+<div class="section">
+  <div class="card">
+    <div class="day-header">
+      <span class="date">DAY 4 · 5/25 Mon</span>
+      <span class="theme">北岸 · 洞穴 · 休闲</span>
+      <span class="booked-icon">🎯</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>时间</th><th>活动</th><th>备注</th></tr>
+        <tr><td>8:00–9:00 AM</td><td><strong>Java Kai</strong> 早餐 🥞</td><td>岛上最佳早餐</td></tr>
+        <tr><td>9:30–11:30 AM</td><td><strong>Fern Grotto</strong> 🛶 羊齒洞穴</td><td>坐船看洞，周一最合适!</td></tr>
+        <tr><td>11:30 AM–12:30 PM</td><td>船上歌舞+步行5分钟到洞穴</td><td></td></tr>
+        <tr><td>12:30–1:30 PM</td><td>午餐</td><td></td></tr>
+        <tr><td>1:30–3:30 PM</td><td><strong>Hanalei Bay</strong> 🌴 纯休闲</td><td>栈桥拍照+Shave Ice</td></tr>
+        <tr><td>3:30–5:00 PM</td><td>回宾馆休息</td><td></td></tr>
+        <tr><td><strong>6:30 PM</strong></td><td><strong>Duke's Kauai</strong> 🎯已订 🍹</td><td>海景+日落+Hula Pie</td></tr>
+      </table>
+    </div>
+    <div class="route-bar">
+      🗺️ <span class="arrow">→</span> Java Kai <span class="arrow">→</span> Fern Grotto <span class="arrow">→</span> Hanalei Bay <span class="arrow">→</span> Duke's
+    </div>
+    <div class="tip"><strong>🍽 午餐推荐:</strong> Wake Up Delicious (法式吐司) / Hanalei Poke</div>
+    <div class="tip"><strong>💡 Fern Grotto:</strong> 船班9:30/11:00/14:00/15:30，只在周中运营 ✓</div>
+  </div>
+</div>
+
+<!-- Day 5 -->
+<div class="section">
+  <div class="card">
+    <div class="day-header">
+      <span class="date">DAY 5 · 5/26 Tue</span>
+      <span class="theme">离开 · 最后浮潜</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>时间</th><th>活动</th><th>备注</th></tr>
+        <tr><td>7:30–8:30 AM</td><td><strong>Wailua Falls</strong> 🌊</td><td>开车即看，彩虹瀑布</td></tr>
+        <tr><td>8:30–9:30 AM</td><td>早餐</td><td></td></tr>
+        <tr><td>9:30–10:30 AM</td><td><strong>Lydgate Park</strong> 最后浮潜 🏊</td><td>离宾馆5分钟</td></tr>
+        <tr><td><strong>10:30 AM</strong></td><td><strong>Thrifty还车</strong> 🚗</td><td></td></tr>
+        <tr><td><strong>11:00 AM</strong></td><td><strong>宾馆Check-out</strong></td><td></td></tr>
+        <tr><td>11:00 AM–2:00 PM</td><td>机场寄存行李 / 附近逛逛</td><td>Lihue市中心</td></tr>
+        <tr><td><strong>3:02 PM</strong></td><td><strong>AS 264 LIH→PDX</strong> ✈️</td><td>到达PDX 8:37pm</td></tr>
+      </table>
+    </div>
+    <div class="route-bar">
+      🗺️ <span class="arrow">→</span> Wailua Falls <span class="arrow">→</span> Lydgate <span class="arrow">→</span> 还车 <span class="arrow">→</span> 机场
+    </div>
+    <div class="tip"><strong>🍽 早餐推荐:</strong> Cafe Turmeric (Smoothie Bowl) / 宾馆附近</div>
+  </div>
+</div>
+
+<!-- Dining Overview -->
+<div class="section">
+  <div class="card">
+    <h2>🍽 餐饮一览 (Dining Overview)</h2>
+    <div class="food-grid">
+      <div class="food-item"><span class="meal">5/22 午餐</span>Hamura Saimin / Mark's Place</div>
+      <div class="food-item"><span class="meal">5/22 晚餐</span>Kilauea Fish Market / 宾馆附近</div>
+      <div class="food-item"><span class="meal">5/23 午餐</span>Puka Dog / Keoki's Paradise</div>
+      <div class="food-item"><span class="meal">5/23 晚餐</span><span class="status">🎯 The Plantation House 已订 7PM</span></div>
+      <div class="food-item"><span class="meal">5/24 午餐</span>自带野餐 (Waimea Canyon)</div>
+      <div class="food-item"><span class="meal">5/24 晚餐</span>Little Fatties / Merriman's</div>
+      <div class="food-item"><span class="meal">5/25 早餐</span>Java Kai 🥞</div>
+      <div class="food-item"><span class="meal">5/25 午餐</span>Wake Up Delicious / Hanalei Poke</div>
+      <div class="food-item"><span class="meal">5/25 晚餐</span><span class="status">🎯 Duke's Kauai 已订 6:30PM</span></div>
+      <div class="food-item"><span class="meal">5/26 早餐</span>Cafe Turmeric / 宾馆</div>
+    </div>
+  </div>
+</div>
+
+<!-- Reminders -->
+<div class="section">
+  <div class="card">
+    <h2>⏰ 重要提醒 (Reminders)</h2>
+    <ul class="reminder-list">
+      <li><strong>时差:</strong> HST比PDT慢3小时（PDX正午 = Kauai早上9点）</li>
+      <li><strong>现金:</strong> Hamura Saimin只收现金，请备足美金</li>
+      <li><strong>预订:</strong> Duke's已订6:30pm日落位 ✓</li>
+      <li><strong>装备:</strong> 浮潜装备、防晒、泳衣、运动鞋 (Waimea Canyon)</li>
+      <li><strong>Fern Grotto:</strong> 只在周中运营，5/25周一 ✓ 完美匹配</li>
+      <li><strong>火车:</strong> Kilohana Train 建议确认周六运营时间</li>
+      <li><strong>还车:</strong> 5/26 10:30AM Thrifty — 宾馆到机场约20分钟</li>
+    </ul>
+  </div>
+</div>
+
+<div class="footer">
+  数据来源: Google Slides (可爱岛 5/22-5/26 2026) · 生成日期: 2026-05-20
+</div>
+
+</div>
+</body>
+</html>

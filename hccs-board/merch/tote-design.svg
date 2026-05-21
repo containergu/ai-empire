@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" width="600" height="700">
+  <!-- Tote Bag Body -->
+  <rect x="100" y="140" width="400" height="470" rx="5" fill="#F5F0E8" stroke="#222" stroke-width="2"/>
+
+  <!-- Bag flaps at top -->
+  <path d="M100 140 L105 110 L495 110 L500 140 Z" fill="#F5F0E8" stroke="#222" stroke-width="2"/>
+
+  <!-- Handles -->
+  <path d="M200 110 Q200 30 230 30 L250 30 Q280 30 280 110"
+        fill="none" stroke="#222" stroke-width="6" stroke-linecap="round"/>
+  <path d="M320 110 Q320 30 350 30 L370 30 Q400 30 400 110"
+        fill="none" stroke="#222" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Inner shading -->
+  <rect x="102" y="142" width="396" height="466" rx="4" fill="none" stroke="#DDD" stroke-width="0.5"/>
+
+  <!-- Bottom fold -->
+  <path d="M100 580 Q300 595 500 580" fill="none" stroke="#DDD" stroke-width="1"/>
+
+  <!-- === CENTER DESIGN === -->
+  <g transform="translate(300, 360)">
+
+    <!-- Circular seal/badge -->
+    <circle cx="0" cy="0" r="80" fill="none" stroke="#1B365D" stroke-width="3"/>
+    <circle cx="0" cy="0" r="73" fill="none" stroke="#1B365D" stroke-width="1" opacity="0.4"/>
+
+    <!-- Top arc - English name -->
+    <text x="0" y="-45" font-family="Georgia, 'Times New Roman', serif" font-size="11"
+          fill="#1B365D" text-anchor="middle" font-weight="bold" letter-spacing="2">HOPE CHINESE CHARTER</text>
+    <text x="0" y="-32" font-family="Georgia, 'Times New Roman', serif" font-size="11"
+          fill="#1B365D" text-anchor="middle" font-weight="bold" letter-spacing="2">SCHOOL</text>
+
+    <!-- Decorative line -->
+    <line x1="-45" y1="-20" x2="45" y2="-20" stroke="#C41E3A" stroke-width="1.5"/>
+
+    <!-- Chinese characters - main -->
+    <text x="0" y="5" font-family="STKaiti, KaiTi, SimSun, serif" font-size="28"
+          fill="#C41E3A" text-anchor="middle">希望</text>
+
+    <!-- Decorative line -->
+    <line x1="-45" y1="20" x2="45" y2="20" stroke="#C41E3A" stroke-width="1.5"/>
+
+    <!-- Bottom arc - Chinese subtext -->
+    <text x="0" y="38" font-family="STKaiti, KaiTi, SimSun, serif" font-size="13"
+          fill="#1B365D" text-anchor="middle">中文特许学校</text>
+
+    <!-- Small star accents -->
+    <polygon points="-50,-50 -48,-46 -44,-46 -47,-43 -46,-39 -50,-42 -54,-39 -53,-43 -56,-46 -52,-46"
+             fill="#C9A84C" opacity="0.7" transform="scale(0.7)"/>
+    <polygon points="50,-50 52,-46 56,-46 53,-43 54,-39 50,-42 46,-39 47,-43 44,-46 48,-46"
+             fill="#C9A84C" opacity="0.7" transform="scale(0.7)"/>
+  </g>
+
+  <!-- Bottom text -->
+  <text x="300" y="640" font-family="Arial, Helvetica, sans-serif" font-size="7"
+        fill="#999" text-anchor="middle" opacity="0.5" letter-spacing="1">HCCS MERCH · CONCEPT</text>
+</svg>

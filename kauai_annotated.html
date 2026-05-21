@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kauai 景观手绘注解</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #2c2c2c;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    padding: 30px 20px;
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Kalam', cursive, sans-serif;
+  }
+
+  .page-title {
+    color: #f5efe8;
+    font-size: 24px;
+    letter-spacing: 4px;
+    text-align: center;
+    font-weight: normal;
+  }
+  .page-title small {
+    font-size: 14px;
+    opacity: 0.6;
+    display: block;
+    margin-top: 6px;
+    letter-spacing: 2px;
+  }
+
+  .frame {
+    background: #f5efe8;
+    padding: 25px 25px 30px;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    max-width: 960px;
+    width: 100%;
+  }
+
+  .frame h3 {
+    font-weight: normal;
+    font-size: 16px;
+    color: #888;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+    text-align: center;
+  }
+  .frame h3 span { color: #e74c8b; }
+
+  .photo-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #ddd;
+  }
+
+  .photo-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Annotation base */
+  .anno {
+    position: absolute;
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Kalam', cursive;
+    pointer-events: none;
+  }
+
+  .anno .line {
+    position: absolute;
+    border: 2.5px solid rgba(255,255,255,0.9);
+    border-radius: 50%;
+    transform-origin: center;
+  }
+
+  .anno .dash-line {
+    position: absolute;
+    height: 0;
+    border-top: 2.5px dashed rgba(255,255,255,0.8);
+    transform-origin: left center;
+  }
+
+  .bubble {
+    position: absolute;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(3px);
+    padding: 5px 13px;
+    border-radius: 20px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #fff;
+    white-space: nowrap;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    transform-origin: center;
+  }
+
+  .bubble-sm { font-size: 12px; padding: 4px 11px; }
+  .bubble-lg { font-size: 16px; padding: 7px 17px; }
+
+  .sparkle {
+    position: absolute;
+    color: rgba(255,255,200,0.8);
+    font-size: 18px;
+    text-shadow: 0 0 6px rgba(255,255,200,0.5);
+    pointer-events: none;
+  }
+
+  .steam {
+    position: absolute;
+    color: rgba(255,255,255,0.25);
+    font-size: 24px;
+    pointer-events: none;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); opacity: 0.25; }
+    50% { transform: translateY(-8px); opacity: 0.5; }
+  }
+
+  .heart {
+    position: absolute;
+    color: rgba(255,150,150,0.6);
+    font-size: 16px;
+    pointer-events: none;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 1; }
+  }
+
+  .star {
+    position: absolute;
+    color: rgba(255,215,100,0.6);
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  .footer-note {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 13px;
+    color: #999;
+    letter-spacing: 2px;
+  }
+  .footer-note span { color: #e74c8b; }
+
+  @media (max-width: 700px) {
+    .frame { padding: 12px; }
+    .bubble { font-size: 11px; padding: 3px 9px; }
+    .bubble-lg { font-size: 13px; padding: 5px 13px; }
+    .sparkle { font-size: 13px; }
+    .steam { font-size: 16px; }
+    .heart { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  🌴 Kauai · 可爱岛
+  <small>手绘注解景观 · 想去的地方 +1</small>
+</div>
+
+<!-- ============ PHOTO 1: WAIMEA CANYON ============ -->
+<div class="frame">
+  <h3>⛰️ <span>Waimea Canyon</span> · 太平洋的大峡谷</h3>
+
+  <div class="photo-wrapper" style="aspect-ratio:900/500;">
+    <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/17/5d/e4/waimea-canyon.jpg?w=900&h=500&s=1"
+         alt="Waimea Canyon, Kauai">
+
+    <!-- 1. 峡谷 -->
+    <div class="anno" style="left:38%; top:30%;">
+      <div class="dash-line" style="width:55px; left:-60px; top:14px; transform:rotate(-20deg);"></div>
+      <div class="bubble" style="left:-170px; top:-5px; transform:rotate(-1deg);">
+        🏜️ 好深！ 这就是"太平洋的大峡谷"
+      </div>
+    </div>
+
+    <!-- 2. 红色岩层 -->
+    <div class="anno" style="left:58%; top:55%;">
+      <div class="line" style="width:110px; height:65px; left:-4px; top:-10px; border-radius:40% 60% 50% 50%; transform:rotate(-4deg);"></div>
+      <div class="bubble bubble-sm" style="left:100px; top:-18px; transform:rotate(3deg);">
+        🟠 红色的火山岩 好特别
+      </div>
+    </div>
+
+    <!-- 3. 绿色植被 -->
+    <div class="anno" style="left:22%; top:50%;">
+      <div class="dash-line" style="width:45px; left:-50px; top:8px; transform:rotate(-30deg);"></div>
+      <div class="bubble bubble-sm" style="left:-150px; top:-6px; transform:rotate(-2deg);">
+        🌿 绿绿的树长在悬崖上 好厉害
+      </div>
+    </div>
+
+    <!-- 4. 云 -->
+    <div class="anno" style="left:68%; top:12%;">
+      <div class="dash-line" style="width:40px; left:-46px; top:14px; transform:rotate(-15deg);"></div>
+      <div class="bubble bubble-sm" style="left:-148px; top:2px; transform:rotate(2deg);">
+        ☁️ 云飘好低 好像在仙境
+      </div>
+    </div>
+
+    <!-- 5. 瀑布 -->
+    <div class="anno" style="left:50%; top:64%;">
+      <div class="dash-line" style="width:35px; left:-40px; top:-2px; transform:rotate(-10deg);"></div>
+      <div class="bubble bubble-sm" style="left:-130px; top:-18px; transform:rotate(-1deg);">
+        💧 Waipo'o Falls 藏在里面！
+      </div>
+    </div>
+
+    <!-- Decorations -->
+    <div class="sparkle" style="left:30%; top:8%;">✦</div>
+    <div class="sparkle" style="left:72%; top:40%; font-size:13px;">✦</div>
+    <div class="sparkle" style="left:15%; top:22%; font-size:11px;">✦</div>
+    <div class="star" style="left:45%; top:5%;">★</div>
+    <div class="star" style="right:12%; top:25%; font-size:11px;">★</div>
+    <div class="heart" style="left:55%; top:76%;">♥</div>
+
+    <!-- Overall -->
+    <div class="anno" style="left:50%; top:92%; transform:translateX(-50%);">
+      <div class="bubble bubble-lg" style="position:relative; transform:rotate(-1deg);">
+        😮 站在这里会说不出话吧
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Waimea Canyon Lookout · 海拔 ~1,100m · 距 Lihue 约 1.5h 车程
+  </div>
+</div>
+
+<!-- ============ PHOTO 2: NA PALI COAST ============ -->
+<div class="frame">
+  <h3>🌊 <span>Na Pali Coast</span> · 世界最美海岸线</h3>
+
+  <div class="photo-wrapper" style="aspect-ratio:840/630;">
+    <img src="https://www.hawaiiactivities.com/travelguide/wp-content/uploads/Hawaii_Kauai_Puu-o-Kila-Lookout_shutterstock_1561106648.jpg"
+         alt="Na Pali Coast from Puu o Kila Lookout, Kauai">
+
+    <!-- 1. 海岸线 -->
+    <div class="anno" style="left:55%; top:42%;">
+      <div class="dash-line" style="width:60px; left:-66px; top:10px; transform:rotate(-25deg);"></div>
+      <div class="bubble" style="left:-175px; top:-5px; transform:rotate(-2deg);">
+        🌊 Na Pali Coast 海浪拍打悬崖的声音...
+      </div>
+    </div>
+
+    <!-- 2. 悬崖 -->
+    <div class="anno" style="left:30%; top:28%;">
+      <div class="line" style="width:100px; height:80px; left:-5px; top:-10px; border-radius:50% 50% 40% 60%; transform:rotate(-6deg);"></div>
+      <div class="bubble bubble-sm" style="left:90px; top:-22px; transform:rotate(3deg);">
+        🏔️ 900m 高的悬崖 直插大海！
+      </div>
+    </div>
+
+    <!-- 3. Kalalau Valley -->
+    <div class="anno" style="left:38%; top:58%;">
+      <div class="dash-line" style="width:50px; left:-56px; top:2px; transform:rotate(-15deg);"></div>
+      <div class="bubble bubble-sm" style="left:-160px; top:-10px; transform:rotate(1deg);">
+        🌴 Kalalau Valley 传说中远古夏威夷人住的地方
+      </div>
+    </div>
+
+    <!-- 4. 海洋 -->
+    <div class="anno" style="right:12%; bottom:18%;">
+      <div class="dash-line" style="width:50px; left:-55px; top:4px; transform:rotate(-5deg);"></div>
+      <div class="bubble bubble-sm" style="right:0; top:-28px; transform:rotate(-3deg);">
+        🏝️ 太平洋的颜色好蓝好蓝
+      </div>
+    </div>
+
+    <!-- 5. 云 -->
+    <div class="anno" style="left:12%; top:8%;">
+      <div class="bubble bubble-sm" style="left:0; top:-5px; transform:rotate(2deg);">
+        ☁️ 云在山顶飘 像帽子一样
+      </div>
+    </div>
+
+    <!-- 6. 植被 -->
+    <div class="anno" style="left:65%; top:62%;">
+      <div class="dash-line" style="width:40px; left:-45px; top:6px; transform:rotate(-20deg);"></div>
+      <div class="bubble bubble-sm" style="left:-150px; top:-6px; transform:rotate(-1deg);">
+        🌿 满满的绿色 完全没有开发过
+      </div>
+    </div>
+
+    <!-- Decorations -->
+    <div class="sparkle" style="left:45%; top:18%;">✦</div>
+    <div class="sparkle" style="right:18%; top:35%; font-size:14px;">✦</div>
+    <div class="sparkle" style="left:25%; top:48%; font-size:12px;">✦</div>
+    <div class="star" style="right:10%; top:10%;">★</div>
+    <div class="star" style="left:50%; top:85%; font-size:11px;">★</div>
+    <div class="heart" style="right:25%; top:50%;">♥</div>
+    <div class="heart" style="left:33%; top:72%; font-size:13px; animation-delay:1s;">♥</div>
+
+    <!-- Overall -->
+    <div class="anno" style="left:50%; top:93%; transform:translateX(-50%);">
+      <div class="bubble bubble-lg" style="position:relative; transform:rotate(1deg);">
+        ✨ 世界上真的有这么美的地方啊 ✨
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Pu'u O Kila Lookout · Kōkeʻe State Park · 海拔 ~1,280m · 需开车到 Waimea Canyon 最深处
+  </div>
+</div>
+
+</body>
+</html>

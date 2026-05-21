@@ -1,0 +1,105 @@
+Delivered-To: ygu@willamette.edu
+Received: by 2002:a05:7412:b14:b0:1d7:658d:2ede with SMTP id e20csp79898rdc; Wed, 20 May 2026 16:25:08 -0700 (PDT)
+X-Forwarded-Encrypted: i=3; AFNElJ+14wpf1AQ6F6e4kiikUqbia9D5ztoCxKVbeMi2EkU8V6AdaeQ+Wd9XaF0Kznw7TSJoyEI=@willamette.edu
+X-Received: by 2002:a05:6102:50a6:b0:634:8685:d335 with SMTP id ada2fe7eead31-67398f4734cmr414005137.14.1779319508426; Wed, 20 May 2026 16:25:08 -0700 (PDT)
+ARC-Seal: i=2; a=rsa-sha256; t=1779319508; cv=pass; d=google.com; s=arc-20240605; b=XSB8Rh1QQ2qCaJMlwTK1iFCrkQZ+sduJv4T0zMoLP/AvHQmL2/NW8t0JGz4+w4fGDr 0R3wuVrRJCbAOPgX6KYO588TCuhSxa2uvif1WROzxWrG++r6EgimjNCsDAcj4l51yX9b F5GVub304DlQC+Yu8iW+jynz0CEUi3ylkmH4K7oN7TJEHk6H0s4YqUA34WOM3YVgkfI9 eTeDqFjzZwVlEw/b9VxIM/my24QeA6KPlbUcZmcv4JI2kdivkA4dvogfdkSRWL1jw4px f0v2VJ8GRljsFiy0ObPLRcCyujJutDoYLQ+w0GcaXE7lH0fTUJ2cRa/6DXQ6V4xJP9uj 5NHQ==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605; h=to:subject:message-id:date:from:mime-version:dkim-signature; bh=+0rUb+fJLNtVMjqiSA4FeCL0TI6xXK/bck2f3+cOkfg=; fh=qfK4SSCDW3QAf8u397MihH5c5FD3cY6yTptiL3ssF40=; b=d6Y/euA/waB9CWmNr6rY6h0NfSWg5gxx7uzb5tf8XmXfS2y2ol+lgkr4cNDbTzmP92 SJ0+AmCHW5QWblEB5n2Ree4r8nnotMfj2UP7DMdV+5BzvY7EC1VBCuWbO9o/aF2SJtZy /WZ2OK1YN1h900qPdcnEXbUQu5lH6QyVHv6AaIGygd01FTVBkSV3ryzzvdW8M1O6p33e y0JmMxY0gKwaQtMTqARZY+wJh8dM9Tp1wmQS8oSuCFTzAWtJbXAXa42jvdYP9h6w3JJw AtaR36B2OtXVdZo3Jw1SmRrbKoMUcFd9bYDMGgsXq5zjbwk3EqBRodyHKmKjJRleXKxl HVRg==; dara=google.com
+ARC-Authentication-Results: i=2; mx.google.com; dkim=pass header.i=@willamette.edu header.s=google header.b=JZgyruZZ; arc=pass (i=1); spf=pass (google.com: domain of jcthomps@willamette.edu designates 209.85.220.41 as permitted sender) smtp.mailfrom=jcthomps@willamette.edu; dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=willamette.edu; dara=neutral header.i=@willamette.edu
+Return-Path: <jcthomps@willamette.edu>
+Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41]) by mx.google.com with SMTPS id ada2fe7eead31-6470e2687besor6671204137.5.2026.05.20.16.25.08 for <ygu@willamette.edu> (Google Transport Security); Wed, 20 May 2026 16:25:08 -0700 (PDT)
+Received-SPF: pass (google.com: domain of jcthomps@willamette.edu designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;
+Authentication-Results: mx.google.com; dkim=pass header.i=@willamette.edu header.s=google header.b=JZgyruZZ; arc=pass (i=1); spf=pass (google.com: domain of jcthomps@willamette.edu designates 209.85.220.41 as permitted sender) smtp.mailfrom=jcthomps@willamette.edu; dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=willamette.edu; dara=neutral header.i=@willamette.edu
+ARC-Seal: i=1; a=rsa-sha256; t=1779319508; cv=none; d=google.com; s=arc-20240605; b=laBh4Xsalk1SjqRxHZh/8dXSStD5BtTWwExa2OESLDduI0cyUJjun+HI1l9JvmKRtg Y+Rpqw4eX+VHHAgq/i5P5rt/OataIkxGtqjNRMVCJx8Bmr1LiD502EiIP+h2KgY2ciaX 8cZEYc0rTHs6WDK5PggRko6/VHk8RFl9z2LKCtUdiMfCkQDLpWQ9VddtKLZThT7kEbNl pK4CH6jR9SMNH7fGSND0JqIo4Z8u9n5gFus0HwArzE0J9kCF7eyLh6wtOb63To4BQiGG CB6zxTAut+ccjbSNWWvdT50g2uMAm0hWRq6PI1pIoqqxGJmMpgxjIs4z+jqyFKXy3clD uhiw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605; h=to:subject:message-id:date:from:mime-version:dkim-signature; bh=+0rUb+fJLNtVMjqiSA4FeCL0TI6xXK/bck2f3+cOkfg=; fh=qfK4SSCDW3QAf8u397MihH5c5FD3cY6yTptiL3ssF40=; b=W9V3grZZr4sOMldqheXIcW7RoCXZucGtAps3kLAQN5hDGr3OMLEM3PscjpkWpa6mC+ o43pyCIpCL3HiLNF4KE5Kl1M2Kuu3SwF1G+m0Jjy4up94kWwLpkH4B0b1sGgrwB/9xL8 jUqOsv5UuodOUwXpbdUPrqzWkBC+YWOxOPTm1yIhcuQEXWhNvnpDobWdOPwJlnKQjQh2 /udQOJojaEc48CKQQvQczUhOMcghhOY5a/8TDF7S97gQ9xU11+K0goOvX8kyXnOkancZ tyLWUkMiXiId9uF8VeFXEHRzOacJQ7ywDtBLsxBuBYXrs0tKtv93tet+AERlWjpE0ABv SG+A==; darn=willamette.edu
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willamette.edu; s=google; t=1779319508; x=1779924308; darn=willamette.edu; h=to:subject:message-id:date:from:mime-version:from:to:cc:subject :date:message-id:reply-to; bh=+0rUb+fJLNtVMjqiSA4FeCL0TI6xXK/bck2f3+cOkfg=; b=JZgyruZZMCc2i0qdtmGNwT5S9UL2HSBmFArcci7WN5g/3Xi5HnSesiyLtlKDuMGHnj OHcMhN3zzd7rhxvkiwl2LPSX7cfrLa5O1mbFcFEaeTxnD8gLHEbrGYU0vTNGMrJ0iHIq JG5nSE9kdXR6g9V7vhWBzEJW7HDSMlyZjtuB0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1e100.net; s=20251104; t=1779319508; x=1779924308; h=to:subject:message-id:date:from:mime-version:x-gm-gg :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to; bh=+0rUb+fJLNtVMjqiSA4FeCL0TI6xXK/bck2f3+cOkfg=; b=spujpapR63yvGhqbr62f3xglkOnaDsrxPnPH1PLeN1Aogm3+KCtvVvXXhyu3anm1KJ 5uKeDGNl8fYlx+lAg3Zp+rDGZdaN6w6epoMAYvyyxvCXH9DChh17qiMwjKgUgcmDDcsz XRXiECYnLS6F/gqqTSsyhS39c9+MOEhI/5FxNaGCpLopwgRUZ0+BEH0Douy/n4a6bvl4 deoDt2s118qljXUVnlfJ7ZxIwe1h9zb/uzMUG6lwJqWoA5NpqwmPFtoNxkrdPW1/eaAh 1SDsEj2Y6KXeTyHMCWiyjnhdFJWvS+PDDflU4lWQqopg/gF8xnNpOqYjMRBR95aJJ/RT lHkA==
+X-Forwarded-Encrypted: i=1; AFNElJ94T0mQ8jF4to1I4xTqnNhN1uBavnWHqBbAShX1YM6WI9zK3q/sfrozmC/Q7HQwu99HC2A=@willamette.edu
+X-Gm-Message-State: AOJu0YwKiZUVeX2m/b8CTgZLLpfJR6H3YbTBtWzL+jqdlZ1CV19v50yG Z/nCNQiWFdKDWzWlpuC0n+nRkJhMulV6oSpO1sK+M83chwQVNe1q70lV1FERAqHDnkONRo5P3Xh R91fnEpL+HFXZZcEazGR87E1yReRJfdZAw0/eylwXaa2y
+X-Gm-Gg: Acq92OFI5MFhNx2ZTflbRDlwpYUw2eDjeuX47oZnuD2uV5nsRe3zv6aRcffHPPjEkk3 VyI0/VTjrgzfpPY/HwIn7xOV9JbAY9A8toY5ho0CjoDtJZ1J+o1aWwA+Gc/DutPwdxTaD5WYerG OkoiyCSDOVeRynSnaagiIXc9pbz1UOOa2+lEcxrlSHpPu1zFcRZR7DqaIb4c8koIzFJufO4UdgD 7/Qfh4P1lDDAbPGa6emm/dRXMKRCHMGOXxV/L3b+ASiSpqi8ubSeRbV4FCbSWFXl2NP/hDIL/Vy VxyEzmqtZHLbhVmhs9aaL9RxDdK+Vigkvb84GOYBYZRCUCTUtg+MrVrRFtjVr99eRZXiBFEVs3P CDSZJIIvxKi598+9eRNVob61a9bAbgR69bQM/K/jsvqQoikto7ots66dQACuHlS4njqJOEqHL3w hf+2CxsW2fTA==
+X-Received: by 2002:a05:6102:4427:b0:633:d7ec:153e with SMTP id ada2fe7eead31-6739e547979mr388908137.28.1779319507921; Wed, 20 May 2026 16:25:07 -0700 (PDT)
+MIME-Version: 1.0
+From: Jonathan Thompson <jcthomps@willamette.edu>
+Date: Wed, 20 May 2026 16:24:58 -0700
+X-Gm-Features: AVHnY4KbVG3TzR7lWumNW_iMbYp6mJJI-g-qGiH3PHOqMIYqf8a9DlcaaIbMePw
+Message-ID: <CACMEF2V2mFoRW_YPRQF2st0hq-WTsGrAsG4SC6aChMt1TY52Ow@mail.gmail.com>
+Subject: Poster Session status
+To: Robert Walker <rwalker@willamette.edu>, George Gu <ygu@willamette.edu>
+Content-Type: multipart/alternative; boundary="0000000000003641860652481bf0"
+
+--0000000000003641860652481bf0
+Content-Type: text/plain; charset="UTF-8"
+
+Gentlemen,
+Find attached my synthesis of our discussion from the most recent faculty
+meeting. Let me know what you think.
+
+What we provisionally agreed to:
+1. The Capstone course, especially for EC/CC, MBAP, one year, undergrad
+business.
+2. Continuing to flesh out the poster session idea.
+a. Poster sessions will be on social science research day (SSRD),
+conditional on university acceptance.
+b. Poster sessions may include outside community members as a networking
+event.
+c. The quantitative rubric will be something like three elements;
+presentation/communication (broken into constituent elements such as
+presentation/poster quality, etc.), specific disciplines with identified
+topics/ideas, and logical consistency/integration.
+d. There may be a written submission evaluated as well; this was raised but
+I forgot to highlight it in the provisional vote.
+e. By construction, we will NOT be able to focus exclusively on our own
+areas during evaluation; I stated that we would be able to focus this way
+and it was pointed out that this is unlikely to be true.
+3. Tim is empowered, with support from an as yet unnamed faculty member, to
+take ownership of inviting outside evaluators. The objective function here
+is still underspecified; we may want former students, current employers,
+etc.
+
+If you gentlemen agree with this synthesis, please just let me know. I
+think that the next step, if we agree, is to distribute a version of this
+to Romana and then the faculty for clarity. Then, if there are no strong
+complaints, we move on to build a prototype (likely with Jim) of the
+project, presentation and evaluation, including rubrics.
+
+Please let me know your thoughts. Because he volunteered for this task,
+I've included Tim on this email to make sure he's not being referenced
+without his knowledge.
+
+Best,
+-Jon C Thompson
+
+--0000000000003641860652481bf0
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Gentlemen,<div>Find attached my synthesis of our discussio=
+n from the most recent faculty meeting. Let me know what you think.</div><d=
+iv><br></div><div>What we provisionally agreed to:<br>1. The Capstone cours=
+e, especially for EC/CC, MBAP, one year, undergrad business.</div><div>2. C=
+ontinuing to flesh out the poster session idea.=C2=A0</div><div>a. Poster s=
+essions will be on social science research day (SSRD), conditional on unive=
+rsity acceptance.</div><div>b. Poster sessions may include outside communit=
+y members as a networking event.</div><div>c. The quantitative rubric will =
+be something like three elements; presentation/communication (broken into c=
+onstituent elements such as presentation/poster quality, etc.), specific di=
+sciplines with identified topics/ideas, and logical consistency/integration=
+.</div><div>d. There may be a written submission evaluated as well; this wa=
+s raised but I forgot to highlight it in the provisional vote.</div><div>e.=
+ By construction, we will NOT be able to focus exclusively on our own areas=
+ during evaluation; I stated that we would be able to focus this way and it=
+ was pointed out that this is unlikely to be true.</div><div>3. Tim is empo=
+wered, with support from an as yet unnamed faculty member, to take ownershi=
+p of inviting outside evaluators. The objective function here is still unde=
+rspecified; we may want former students, current employers, etc.</div><div>=
+<br></div><div>If you gentlemen agree with this synthesis, please just let =
+me know. I think that the next step, if we agree, is to distribute a versio=
+n of this to Romana and then the faculty for clarity. Then, if there are no=
+ strong complaints, we move on to build a prototype (likely with Jim) of th=
+e project, presentation and evaluation, including rubrics.</div><div><br></=
+div><div>Please let me know your thoughts. Because he volunteered for this =
+task, I&#39;ve included Tim on this email to make sure he&#39;s not being r=
+eferenced without his knowledge.</div><div><br></div><div>Best,</div><div>-=
+Jon C Thompson</div></div>
+
+--0000000000003641860652481bf0--

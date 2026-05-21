@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" width="600" height="700">
+  <defs>
+    <clipPath id="hoodieClip">
+      <path d="M300 60 L230 65 L160 55 L130 70 L160 110 L190 115 L190 620 L410 620 L410 115 L440 110 L470 70 L440 55 L370 65 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Hoodie Base -->
+  <path d="M300 60 L230 65 L160 55 L130 70 L160 110 L190 115 L190 620 L410 620 L410 115 L440 110 L470 70 L440 55 L370 65 Z"
+        fill="#2D2D2D" stroke="#111" stroke-width="2"/>
+
+  <!-- Hood -->
+  <path d="M240 62 Q220 40 200 55 Q185 65 190 80 Q195 70 210 65 Q230 58 250 60"
+        fill="#2D2D2D" stroke="#111" stroke-width="2"/>
+  <path d="M360 62 Q380 40 400 55 Q415 65 410 80 Q405 70 390 65 Q370 58 350 60"
+        fill="#2D2D2D" stroke="#111" stroke-width="2"/>
+
+  <!-- Center zipper line -->
+  <line x1="300" y1="80" x2="300" y2="620" stroke="#444" stroke-width="1.5"/>
+
+  <!-- Pockets -->
+  <path d="M200 350 Q300 370 400 350 L400 390 Q300 410 200 390 Z"
+        fill="none" stroke="#444" stroke-width="1.5"/>
+
+  <!-- Back Design (Center) -->
+  <g transform="translate(300, 250)">
+
+    <!-- Circle frame -->
+    <circle cx="0" cy="0" r="95" fill="none" stroke="#C41E3A" stroke-width="2.5"/>
+    <circle cx="0" cy="0" r="88" fill="none" stroke="#C41E3A" stroke-width="0.8" opacity="0.5"/>
+
+    <!-- Decorative Chinese cloud/scroll pattern -->
+    <path d="M-70 -30 Q-55 -45 -40 -30 Q-25 -45 -10 -30 Q5 -45 20 -30 Q35 -45 50 -30"
+          fill="none" stroke="#C41E3A" stroke-width="1.2" opacity="0.6"/>
+    <path d="M-70 30 Q-55 45 -40 30 Q-25 45 -10 30 Q5 45 20 30 Q35 45 50 30"
+          fill="none" stroke="#C41E3A" stroke-width="1.2" opacity="0.6"/>
+
+    <!-- Mission phrase - English -->
+    <text x="0" y="-18" font-family="Georgia, 'Times New Roman', serif" font-size="13"
+          fill="#E8E8E8" text-anchor="middle" font-weight="bold" letter-spacing="4">EDUCATING FOR</text>
+    <text x="0" y="-2" font-family="Georgia, 'Times New Roman', serif" font-size="13"
+          fill="#E8E8E8" text-anchor="middle" font-weight="bold" letter-spacing="4">GLOBAL FLUENCY</text>
+
+    <!-- Separator -->
+    <line x1="-40" y1="10" x2="40" y2="10" stroke="#C41E3A" stroke-width="1"/>
+
+    <!-- Chinese translation -->
+    <text x="0" y="32" font-family="STKaiti, KaiTi, SimSun, serif" font-size="15"
+          fill="#C9A84C" text-anchor="middle">培养全球语言能力</text>
+
+    <!-- Small subtitle -->
+    <text x="0" y="50" font-family="Arial, Helvetica, sans-serif" font-size="7"
+          fill="#999" text-anchor="middle" letter-spacing="2">HOPE CHINESE CHARTER SCHOOL</text>
+
+    <!-- Small decorative circles -->
+    <circle cx="-35" cy="62" r="2" fill="#C41E3A" opacity="0.5"/>
+    <circle cx="0" cy="65" r="2" fill="#C41E3A" opacity="0.5"/>
+    <circle cx="35" cy="62" r="2" fill="#C41E3A" opacity="0.5"/>
+  </g>
+
+  <!-- Chest small logo -->
+  <g transform="translate(130, 130)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="8"
+          fill="#C9A84C" font-weight="bold" letter-spacing="2">HCCS</text>
+  </g>
+
+  <!-- Bottom text -->
+  <text x="300" y="640" font-family="Arial, Helvetica, sans-serif" font-size="7"
+        fill="#C9A84C" text-anchor="middle" opacity="0.5" letter-spacing="1">HCCS MERCH · CONCEPT</text>
+</svg>

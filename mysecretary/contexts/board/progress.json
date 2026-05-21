@@ -1,0 +1,35 @@
+{
+  "completed": [
+    "DB_Budget.pdf",
+    "DD_Grant_Funding_Proposals.pdf",
+    "DE_Revenues_Private_State_Federal.pdf",
+    "DFA_Investment_of_Funds.pdf",
+    "DFA-AR_Donated_Stock_Securities.pdf",
+    "DGA_Authorized_Signatures.pdf",
+    "DIC_Financial_Reports_Statements.pdf",
+    "DIE_Audits.pdf",
+    "DJ_Purchasing.pdf",
+    "DJ-AR_Meals_Refreshments_Gifts.pdf",
+    "DJB_Petty_Cash.pdf",
+    "DJC_Bidding_Requirements.pdf",
+    "DJC-AR_Special_Procurements.pdf",
+    "DLC_Expense_Tuition_Reimbursement.pdf",
+    "DLC-AR_Tuition_Assistance_Staff_Expense.pdf",
+    "D_Disposal_School_Property.pdf"
+  ],
+  "current": "BD-BDA Board Meetings / Oregon Public Meetings Law",
+  "section_complete": "D - Fiscal Management",
+  "notes": [
+    "Finance Committee 负责预算监督、财务报告审查、审计监督、投资监督",
+    "Committee 每年负责审查审计合同，必要时招标",
+    "$5,000 是采购审批的关键门槛",
+    "Board 自身是 Local Contract Review Board (LCRB)"
+  ],
+  "last_session": "2026-05-20",
+  "questions": [
+    "当前审计师是哪家？合同何时到期？",
+    "FY2026-27 预算编制进度？",
+    "目前现金余额和投资情况？",
+    "HCCS 是否有长期债务或租赁承诺？"
+  ]
+}

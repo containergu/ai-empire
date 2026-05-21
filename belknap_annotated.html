@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Belknap Hot Springs 手绘注解</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #2c2c2c;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Kalam', cursive, sans-serif;
+    padding: 20px;
+  }
+
+  .frame {
+    background: #f5efe8;
+    padding: 30px 30px 35px;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    max-width: 980px;
+  }
+
+  .photo-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 900 / 500;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #ddd;
+  }
+
+  .photo-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ---- Annotation base ---- */
+  .anno {
+    position: absolute;
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Kalam', cursive;
+    pointer-events: none;
+  }
+
+  /* Hand-drawn circle/underline using pseudo-elements */
+  .anno .line {
+    position: absolute;
+    border: 2.5px solid rgba(255,255,255,0.9);
+    border-radius: 50%;
+    transform-origin: center;
+  }
+
+  .anno .arrow-line {
+    position: absolute;
+    height: 2.5px;
+    background: rgba(255,255,255,0.9);
+    transform-origin: left center;
+  }
+
+  .anno .arrow-head {
+    position: absolute;
+    width: 0; height: 0;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+  }
+
+  .anno .dash-line {
+    position: absolute;
+    height: 0;
+    border-top: 2.5px dashed rgba(255,255,255,0.8);
+    transform-origin: left center;
+  }
+
+  /* ---- Text bubble style ---- */
+  .bubble {
+    position: absolute;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(3px);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 15px;
+    line-height: 1.4;
+    color: #fff;
+    white-space: nowrap;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    /* hand-drawn feel: slight rotation */
+    transform-origin: center;
+  }
+
+  .bubble-sm {
+    font-size: 13px;
+    padding: 4px 12px;
+  }
+
+  .bubble-lg {
+    font-size: 17px;
+    padding: 8px 18px;
+  }
+
+  /* ---- Decorative elements ---- */
+  .sparkle {
+    position: absolute;
+    color: rgba(255,255,200,0.85);
+    font-size: 20px;
+    text-shadow: 0 0 6px rgba(255,255,200,0.6);
+    pointer-events: none;
+  }
+
+  .steam {
+    position: absolute;
+    color: rgba(255,255,255,0.3);
+    font-size: 28px;
+    font-weight: bold;
+    pointer-events: none;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); opacity: 0.3; }
+    50% { transform: translateY(-10px); opacity: 0.6; }
+  }
+
+  .heart {
+    position: absolute;
+    color: rgba(255,150,150,0.7);
+    font-size: 18px;
+    pointer-events: none;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.2); opacity: 1; }
+  }
+
+  .star {
+    position: absolute;
+    color: rgba(255,215,100,0.7);
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  /* ---- Overall footer ---- */
+  .footer-note {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #888;
+    letter-spacing: 2px;
+  }
+
+  .footer-note span {
+    color: #e74c8b;
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 700px) {
+    .frame { padding: 15px; }
+    .bubble { font-size: 11px; padding: 4px 10px; }
+    .bubble-lg { font-size: 13px; padding: 6px 14px; }
+    .sparkle { font-size: 14px; }
+    .steam { font-size: 18px; }
+    .heart { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="frame">
+  <div class="photo-wrapper" id="photo">
+
+    <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/04/25/e8/61/belknap-hot-springs-lodge.jpg?w=900&h=500&s=1"
+         alt="Belknap Hot Springs Lodge and Gardens">
+
+    <!-- ========= ANNOTATIONS ========= -->
+
+    <!-- 1. 温泉池 - 下池 -->
+    <div class="anno" style="left:12%; top:68%;">
+      <div class="dash-line" style="width:80px; left:30px; top:-32px; transform:rotate(-15deg);"></div>
+      <div class="bubble" style="left:100px; top:-58px;">
+        ♨️ 天然温泉
+      </div>
+      <div class="line" style="width:100px; height:70px; left:-8px; top:-20px; border-radius:45% 55% 50% 50%; transform:rotate(-5deg);"></div>
+      <div class="steam" style="left:20px; top:-40px;">
+        ~~~
+      </div>
+      <div class="steam" style="left:55px; top:-52px; animation-delay:1s;">
+        ~~~
+      </div>
+    </div>
+
+    <!-- 2. 水温 -->
+    <div class="anno" style="left:18%; top:82%;">
+      <div class="bubble bubble-sm" style="left:10px; top:2px; transform:rotate(2deg);">
+        🌡️ 92°F 暖暖的～ 刚刚好
+      </div>
+    </div>
+
+    <!-- 3. McKenzie River -->
+    <div class="anno" style="right:15%; bottom:15%;">
+      <div class="dash-line" style="width:60px; left:-70px; top:-4px; transform:rotate(-10deg);"></div>
+      <div class="bubble bubble-sm" style="right:0; top:-30px; transform:rotate(-3deg);">
+        🏞️ McKenzie River 哗啦啦～
+      </div>
+    </div>
+
+    <!-- 4. 花园 -->
+    <div class="anno" style="left:48%; top:20%;">
+      <div class="dash-line" style="width:50px; left:-58px; top:12px; transform:rotate(-25deg);"></div>
+      <div class="bubble" style="left:-170px; top:-10px; transform:rotate(1deg);">
+        🌸 好多花！ Secret Garden 耶
+      </div>
+    </div>
+
+    <!-- 5. 桥 -->
+    <div class="anno" style="left:55%; top:62%;">
+      <div class="line" style="width:90px; height:50px; left:-2px; top:-8px; border-radius:40% 60% 50% 50%; transform:rotate(-3deg);"></div>
+      <div class="bubble bubble-sm" style="left:80px; top:-20px; transform:rotate(2deg);">
+        🌉 通往秘密花园的小路～
+      </div>
+    </div>
+
+    <!-- 6. Lodge -->
+    <div class="anno" style="right:8%; top:8%;">
+      <div class="dash-line" style="width:75px; left:-82px; top:18px; transform:rotate(10deg);"></div>
+      <div class="bubble bubble-sm" style="right:-5px; top:-8px; transform:rotate(-1deg);">
+        🏡 Lodge 住这里好幸福
+      </div>
+    </div>
+
+    <!-- 7. 森林 -->
+    <div class="anno" style="right:22%; top:38%;">
+      <div class="bubble bubble-sm" style="right:0; top:-12px; transform:rotate(4deg);">
+        🌲🌲🌲 空气超清新
+      </div>
+    </div>
+
+    <!-- ========= DECORATIONS ========= -->
+
+    <!-- Sparkles -->
+    <div class="sparkle" style="left:40%; top:15%;">✦</div>
+    <div class="sparkle" style="left:62%; top:35%; font-size:14px;">✦</div>
+    <div class="sparkle" style="left:28%; top:28%; font-size:12px;">✦</div>
+    <div class="sparkle" style="right:20%; top:50%; font-size:15px;">✦</div>
+
+    <!-- Hearts -->
+    <div class="heart" style="left:35%; top:72%;">♥</div>
+    <div class="heart" style="right:35%; top:28%; animation-delay:1s;">♥</div>
+    <div class="heart" style="left:22%; top:52%; font-size:13px; animation-delay:0.5s;">♥</div>
+
+    <!-- Stars -->
+    <div class="star" style="left:15%; top:10%;">★</div>
+    <div class="star" style="right:10%; top:22%; font-size:12px;">★</div>
+    <div class="star" style="left:50%; top:8%; font-size:11px;">★</div>
+
+    <!-- More steam over pool -->
+    <div class="steam" style="left:14%; top:62%; font-size:16px; animation-delay:0.5s;">
+      ～☁️～
+    </div>
+    <div class="steam" style="left:8%; top:70%; font-size:20px; animation-delay:1.5s;">
+      ～～☁️
+    </div>
+
+    <!-- 8. Overall mood - bottom center -->
+    <div class="anno" style="left:50%; top:92%; transform:translateX(-50%);">
+      <div class="bubble bubble-lg" style="position:relative; white-space:nowrap; transform:rotate(-1deg);">
+        ✨ 今天有点幸福～ ✨
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-note">
+    Belknap Hot Springs · McKenzie Bridge, Oregon &nbsp;·&nbsp; <span>♨</span> 距 Portland 约 2.5h
+  </div>
+</div>
+
+</body>
+</html>

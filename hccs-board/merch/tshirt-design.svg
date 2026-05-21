@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" width="600" height="700">
+  <defs>
+    <clipPath id="shirtClip">
+      <path d="M300 80 L220 85 L150 75 L120 90 L150 130 L180 135 L180 620 L420 620 L420 135 L450 130 L480 90 L450 75 L380 85 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Shirt Base -->
+  <path d="M300 80 L220 85 L150 75 L120 90 L150 130 L180 135 L180 620 L420 620 L420 135 L450 130 L480 90 L450 75 L380 85 Z"
+        fill="#1B365D" stroke="#111" stroke-width="2"/>
+
+  <!-- Collar -->
+  <path d="M260 82 Q300 110 340 82" fill="none" stroke="#111" stroke-width="2"/>
+  <path d="M270 85 Q300 108 330 85" fill="none" stroke="#111" stroke-width="1"/>
+
+  <!-- Design: Left Chest Logo Area -->
+  <g transform="translate(180, 180)">
+
+    <!-- Decorative circle background -->
+    <circle cx="55" cy="45" r="50" fill="none" stroke="#C9A84C" stroke-width="1.5" opacity="0.6"/>
+    <circle cx="55" cy="45" r="42" fill="none" stroke="#C9A84C" stroke-width="0.8" opacity="0.4"/>
+
+    <!-- Dragon silhouette (simplified Chinese dragon) -->
+    <path d="M40 35 Q45 20 55 18 Q65 16 70 28 Q75 20 68 14 Q62 10 55 12 Q48 14 45 22 Q42 18 38 28 Q35 38 40 45"
+          fill="none" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M55 18 Q60 12 58 8 Q56 5 52 6 Q48 7 48 12 Q50 10 52 12"
+          fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round"/>
+    <!-- Dragon body curve -->
+    <path d="M40 45 Q35 50 38 58 Q42 65 50 62 Q55 60 52 55"
+          fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round"/>
+    <!-- Dragon dot eye -->
+    <circle cx="58" cy="16" r="1.5" fill="#C9A84C"/>
+
+    <!-- Chinese characters - 希望 -->
+    <text x="55" y="85" font-family="STKaiti, KaiTi, SimSun, serif" font-size="18"
+          fill="#C9A84C" text-anchor="middle" font-weight="bold">希望</text>
+
+    <!-- English text -->
+    <text x="55" y="102" font-family="Arial, Helvetica, sans-serif" font-size="8"
+          fill="#C9A84C" text-anchor="middle" letter-spacing="3">HOPE CHARTER SCHOOL</text>
+
+    <!-- Small decorative lines -->
+    <line x1="20" y1="92" x2="35" y2="92" stroke="#C9A84C" stroke-width="0.5" opacity="0.5"/>
+    <line x1="75" y1="92" x2="90" y2="92" stroke="#C9A84C" stroke-width="0.5" opacity="0.5"/>
+  </g>
+
+  <!-- Bottom-right small text -->
+  <text x="300" y="640" font-family="Arial, Helvetica, sans-serif" font-size="7"
+        fill="#C9A84C" text-anchor="middle" opacity="0.5" letter-spacing="1">HCCS MERCH · CONCEPT</text>
+</svg>
