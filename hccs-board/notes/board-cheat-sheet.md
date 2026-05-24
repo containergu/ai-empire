@@ -1,85 +1,72 @@
-# HCCS Board Member — Cheat Sheet
+# HCCS Board — Cheat Sheet
 
-> Hope Chinese Charter School · Quick Reference · 2026-05-19
-
----
-
-## Mission — One Sentence
-
-> **Educating for global fluency** — developing Chinese & English dual-language skills, nurturing cultural adaptability, inspiring excellence for a positive impact in our world.
->
-> *培养全球语言能力——中英双语、文化适应力、追求卓越、影响世界。*
+> George Gu · Incoming Treasurer · 2026-05
 
 ---
 
-## Core Program — K-8 Chinese/English Dual Immersion
+**Mission:** Educating for global fluency — Chinese/English dual-language, cultural adaptability, excellence.
 
-| Grade | Chinese | English |
-|:-----|:-------:|:-------:|
-| K-2 | **65%** | 35% |
-| 3-5 | **50%** | 50% |
-| 6-8 | **35%** | 65% |
+**Program:** K-8 Chinese/English dual immersion (K-2: 65%C / 3-5: 50%C / 6-8: 35%C) + Tiny Dragons PreK
 
-+ Tiny Dragons (PreK) — enrollment feeder + revenue source
+**Students:** ~420 (cap 600, min 25) | **Budget:** ~$5.4M revenue / $4.7M expense | **Reserves:** 4.5 mo (target 6-8)
+
+**Biggest risk:** ESSER cliff + $1M/yr structural funding gap | **Biggest cost:** Facility $585K/yr
 
 ---
 
-## Three Strategic Priorities (FY24-28)
+## Deadlines (Charter + Oregon Law)
 
-| Priority | Key Targets |
-|:---------|:------------|
-| **1. Academic Success** | OSAS top 8% statewide; K-2 literacy ≥80%, numeracy ≥90%; Gr5 Chinese IM ≥70%; Gr8 listening/speaking IH ≥70% |
-| **2. Family & Community** | Satisfaction ≥80%; retention ≥95%; ≥70% families volunteer |
-| **3. Financial Viability** | Salary ≥95% of BSD; external revenue = 25% of fundraising; reserves 6-8 months (currently 4.5) |
-
----
-
-## Financial Snapshot
-
-| Metric | Value |
-|:-------|:------|
-| Revenue / Expenses | $5.38M / $4.74M (FY2024) |
-| Net Assets | $1.78M (4.5 months runway) |
-| Annual Funding Gap | ~$1M (must fundraise) |
-| Biggest Cost | Facility $585K/yr |
-| Board Fundraising | ≥$3,000/person (direct + in-kind + sponsorships) |
-| Key Risk | ESSER cliff — one-time COVID funds expiring |
+| When | What |
+|:-----|:-----|
+| **Jul 1** | FY starts — budget must be approved |
+| **Jul** (no later) | Annual meeting — elect officers + authorize check signers |
+| **Oct 15** | Revised budget to District (after enrollment known) |
+| **Dec 15** | Annual audit due to District, ODE, State Board |
+| Quarterly (25th) | Financial statements + ops report to District |
+| Monthly (10th) | ADMw enrollment report |
+| **Apr 25** | Draft balanced budget for next FY to District |
 
 ---
 
-## Board Member Expectations
+## Rules That Can Kill You
 
-- **Time**: 10-20 hrs/month (meetings + committee + offline)
-- **Meetings**: ≥75% attendance; 3 consecutive misses = removal
-- **Term**: 2 years
-- **Fundraising**: Auction Gala (host table, sponsorships, items) + ACH Campaign
-- **Events**: ≥3 program events/year + annual board retreat
-- **Transition**: Board shifting from *working* board → *governing* board
-
----
-
-## Key Documents to Know
-
-| Document | Location |
-|:---------|:---------|
-| Charter Agreement 2023-2028 | `Final Charter Agreement 2023_2028.pdf` |
-| Strategic Plan FY24-28 | `strategic_plan_text.txt` / PPT |
-| Board Agreement | `documents/Board of Directors Agreement.md` |
-| Financial Analysis | `notes/financial-sustainability-analysis.md` |
-| Bylaws | `HCCS Amended and Restated Bylaws.pdf` |
+| Rule | What happens |
+|:-----|:-------------|
+| **Financial instability** (§21.1.5) | Charter termination grounds |
+| **Budget variance >10% or $50K** (§13.1) | Must report **immediately** |
+| **Borrow >5% of income** (§13.5) | Illegal without Board approval (building purchase excepted) |
+| **Audit late** (§13.4) | District may withhold **25%** of payments |
+| **Reports late** (§12.5) | Same — up to 25% withheld |
 
 ---
 
-## Quick Answers Board Members Need
+## Treasurer Quick-Reference
 
-> **Q: What's our mission?**
-> A: Educating for global fluency — dual-language Chinese/English, cultural adaptability, excellence.
->
-> **Q: What grades do we serve?**
-> A: K-8 (max 600 students, currently ~420) + Tiny Dragons PreK.
->
-> **Q: What's our biggest challenge?**
-> A: Financial sustainability — ESSER funds expiring, structural funding gap of ~$1M/yr, only 4.5 months of reserves.
->
-> **Q: What's the board's focus?**
-> A: Transitioning from a working board to a governing board, with stronger financial oversight and strategic governance.
+| Limit | Rule |
+|:------|:-----|
+| Admin can approve | ≤**$5K** within budget (DJ) |
+| Board needed | >$5K **not** in budget |
+| Competitive bid required | >**$250K** (Board = LCRB) |
+| Petty cash | **$100** only |
+| Tuition assistance pool | **$30K/yr**, max $3K/employee |
+| Board selects auditor | From OR municipal roster; Finance Cmte reviews annually |
+
+---
+
+## Board Meeting Basics
+
+- **Monthly regular meetings** (~3rd Wed), plus committee meetings
+- **Annual meeting** in July = elect officers + authorize check signers
+- **Quorum** needed for action; majority vote
+- No deliberation among quorum outside meetings (even by email)
+- All meetings within Beaverton SD boundaries
+
+---
+
+## 3 Priorities at a Glance
+
+1. **Academic:** OSAS top 8%; K-2 literacy ≥80%
+2. **Community:** Satisfaction ≥80%; retention ≥95%
+3. **Financial:** Reserves 6-8 mo; salary ≥95% of BSD
+
+> Full references: `notes/charter-agreement-summary.md` · `notes/section-d-fiscal-policies-reference.md`

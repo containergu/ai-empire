@@ -1,0 +1,302 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" width="100%" height="100%">
+  <defs>
+    <!-- Hoodie Fabric Gradient (charcoal with lighting) -->
+    <linearGradient id="hoodieGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2a2a2a" />
+      <stop offset="30%" stop-color="#3a3a3a" />
+      <stop offset="50%" stop-color="#404040" />
+      <stop offset="70%" stop-color="#3a3a3a" />
+      <stop offset="100%" stop-color="#252525" />
+    </linearGradient>
+
+    <!-- Hood gradient -->
+    <linearGradient id="hoodGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#333" />
+      <stop offset="40%" stop-color="#3a3a3a" />
+      <stop offset="100%" stop-color="#2a2a2a" />
+    </linearGradient>
+
+    <!-- Fabric fold shadow -->
+    <linearGradient id="foldShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(0,0,0,0)" />
+      <stop offset="80%" stop-color="rgba(0,0,0,0)" />
+      <stop offset="100%" stop-color="rgba(0,0,0,0.15)" />
+    </linearGradient>
+
+    <!-- HCCS Red for design -->
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e04020" />
+      <stop offset="40%" stop-color="#bf311a" />
+      <stop offset="100%" stop-color="#9e2816" />
+    </linearGradient>
+
+    <!-- Gold accent for design -->
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f4dc00" />
+      <stop offset="40%" stop-color="#fce83a" />
+      <stop offset="100%" stop-color="#c9a84c" />
+    </linearGradient>
+
+    <!-- Ground Shadow -->
+    <radialGradient id="shadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(0,0,0,0.35)" />
+      <stop offset="50%" stop-color="rgba(0,0,0,0.1)" />
+      <stop offset="100%" stop-color="rgba(0,0,0,0)" />
+    </radialGradient>
+
+    <!-- Fabric texture (subtle noise pattern) -->
+    <pattern id="fabricTexture" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" opacity="0.04">
+      <path d="M 0 0 L 8 8 M 8 0 L 0 8" stroke="#666" stroke-width="0.5" />
+      <rect x="2" y="2" width="1" height="1" fill="#777" />
+    </pattern>
+  </defs>
+
+  <!-- ========================================== -->
+  <!-- GROUND SHADOW                               -->
+  <!-- ========================================== -->
+  <ellipse cx="300" cy="665" rx="220" ry="35" fill="url(#shadow)" />
+
+  <!-- ========================================== -->
+  <!-- HOODIE BODY (BACK VIEW)                    -->
+  <!-- ========================================== -->
+
+  <!-- Main body shape -->
+  <path d="
+    M 230 130
+    C 200 140, 160 155, 130 170
+    C 100 185, 80 210, 75 240
+    L 75 430
+    C 75 510, 80 560, 90 590
+    C 96 610, 110 620, 130 620
+    L 470 620
+    C 490 620, 504 610, 510 590
+    C 520 560, 525 510, 525 430
+    L 525 240
+    C 520 210, 500 185, 470 170
+    C 440 155, 400 140, 370 130
+    Z
+  " fill="url(#hoodieGrad)" />
+
+  <!-- ========================================== -->
+  <!-- FABRIC TEXTURE                              -->
+  <!-- ========================================== -->
+  <path d="
+    M 230 130
+    C 200 140, 160 155, 130 170
+    C 100 185, 80 210, 75 240
+    L 75 430
+    C 75 510, 80 560, 90 590
+    C 96 610, 110 620, 130 620
+    L 470 620
+    C 490 620, 504 610, 510 590
+    C 520 560, 525 510, 525 430
+    L 525 240
+    C 520 210, 500 185, 470 170
+    C 440 155, 400 140, 370 130
+    Z
+  " fill="url(#fabricTexture)" />
+
+  <!-- ========================================== -->
+  <!-- HOOD (BACK VIEW)                           -->
+  <!-- ========================================== -->
+  <!-- Hood main shape -->
+  <path d="
+    M 170 120
+    C 150 80, 160 45, 220 30
+    C 260 22, 300 20, 340 22
+    C 380 25, 420 35, 430 45
+    C 445 60, 440 85, 430 120
+    Z
+  " fill="url(#hoodGrad)" />
+
+  <!-- Hood center seam (back of hood) -->
+  <path d="M 300 25 Q 295 60 290 120" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="2" />
+
+  <!-- Hood curved bottom edge shadow -->
+  <path d="
+    M 170 120
+    Q 160 125, 165 130
+    Q 200 145, 230 130
+    Q 265 140, 300 138
+    Q 335 140, 370 130
+    Q 400 145, 435 130
+    Q 440 125, 430 120
+  " fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="3" />
+
+  <!-- ========================================== -->
+  <!-- DRAWSTRINGS (hanging from hood)             -->
+  <!-- ========================================== -->
+  <!-- Left drawstring -->
+  <path d="
+    M 270 125 Q 265 140, 260 180 Q 255 220, 250 260
+  " fill="none" stroke="#555" stroke-width="2.5" stroke-linecap="round" />
+
+  <!-- Right drawstring -->
+  <path d="
+    M 330 125 Q 335 140, 340 180 Q 345 220, 350 240
+  " fill="none" stroke="#555" stroke-width="2.5" stroke-linecap="round" />
+
+  <!-- Drawstring tips (metal aglets) -->
+  <rect x="247" y="258" width="6" height="8" rx="2" fill="#888" transform="rotate(-5, 250, 262)" />
+  <rect x="347" y="238" width="6" height="8" rx="2" fill="#888" transform="rotate(5, 350, 242)" />
+
+  <!-- ========================================== -->
+  <!-- SHOULDER SEAMS (back view)                 -->
+  <!-- ========================================== -->
+  <path d="
+    M 230 130 Q 210 148, 185 165
+  " fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="1.5" />
+
+  <path d="
+    M 370 130 Q 390 148, 415 165
+  " fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="1.5" />
+
+  <!-- Center back seam -->
+  <path d="M 300 138 L 300 615" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="1.5" />
+
+  <!-- ========================================== -->
+  <!-- SIDE SEAMS                                 -->
+  <!-- ========================================== -->
+  <path d="M 100 240 Q 105 400, 110 590" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="1" />
+  <path d="M 500 240 Q 495 400, 490 590" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="1" />
+
+  <!-- ========================================== -->
+  <!-- BOTTOM RIBBING                             -->
+  <!-- ========================================== -->
+  <path d="
+    M 130 620
+    L 470 620
+    C 490 620, 504 610, 510 590
+    L 514 590
+    C 508 615, 492 628, 470 628
+    L 130 628
+    C 108 628, 92 615, 86 590
+    L 90 590
+    C 96 610, 110 620, 130 620
+    Z
+  " fill="#222" />
+
+  <!-- Ribbing texture lines -->
+  <g opacity="0.06">
+    <line x1="140" y1="620" x2="140" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="160" y1="620" x2="160" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="180" y1="620" x2="180" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="200" y1="620" x2="200" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="220" y1="620" x2="220" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="240" y1="620" x2="240" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="260" y1="620" x2="260" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="280" y1="620" x2="280" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="300" y1="620" x2="300" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="320" y1="620" x2="320" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="340" y1="620" x2="340" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="360" y1="620" x2="360" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="380" y1="620" x2="380" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="400" y1="620" x2="400" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="420" y1="620" x2="420" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="440" y1="620" x2="440" y2="628" stroke="#fff" stroke-width="0.8" />
+    <line x1="460" y1="620" x2="460" y2="628" stroke="#fff" stroke-width="0.8" />
+  </g>
+
+  <!-- ========================================== -->
+  <!-- FABRIC FOLDS (subtle)                     -->
+  <!-- ========================================== -->
+  <path d="M 120 300 Q 115 400, 125 550" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="2" />
+  <path d="M 480 300 Q 485 400, 475 550" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="2" />
+
+  <!-- Shoulder blade areas -->
+  <path d="M 200 200 Q 210 280, 195 350" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="3" />
+  <path d="M 400 200 Q 390 280, 405 350" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="3" />
+
+  <!-- ========================================== -->
+  <!-- BACK DESIGN                                 -->
+  <!-- ========================================== -->
+  <g transform="translate(300, 350)">
+
+    <!-- === UPPER BACK: HCCS MONOGRAM === -->
+    <text x="0" y="-168" text-anchor="middle"
+          font-family="'Raleway', Arial, sans-serif" font-size="11"
+          fill="url(#gold)" font-weight="700" letter-spacing="4" opacity="0.5">
+      HCCS
+    </text>
+
+    <!-- === MAIN MISSION STATEMENT === -->
+
+    <!-- "EDUCATING FOR" - smaller, above -->
+    <text x="0" y="-118" text-anchor="middle"
+          font-family="'Raleway', Arial, Helvetica, sans-serif" font-size="22"
+          fill="url(#redGrad)" font-weight="700" letter-spacing="8" opacity="0.9">
+      EDUCATING FOR
+    </text>
+
+    <!-- "GLOBAL FLUENCY" - large, bold, main focus -->
+    <text x="0" y="-80" text-anchor="middle"
+          font-family="'Raleway', Arial, Helvetica, sans-serif" font-size="36"
+          fill="url(#redGrad)" font-weight="900" letter-spacing="6" opacity="0.95">
+      GLOBAL FLUENCY
+    </text>
+
+    <!-- Red divider bar with gold diamond -->
+    <g transform="translate(0, -55)">
+      <line x1="-100" y1="0" x2="-15" y2="0" stroke="url(#redGrad)" stroke-width="2" opacity="0.7" />
+      <polygon points="0,-6 6,0 0,6 -6,0" fill="url(#gold)" opacity="0.8" />
+      <line x1="15" y1="0" x2="100" y2="0" stroke="url(#redGrad)" stroke-width="2" opacity="0.7" />
+    </g>
+
+    <!-- === CHINESE CHARACTERS (large, prominent) === -->
+    <text x="0" y="-18" text-anchor="middle"
+          font-family="'STKaiti', 'KaiTi', 'SimSun', serif" font-size="28"
+          fill="url(#redGrad)" font-weight="bold" letter-spacing="6" opacity="0.92">
+      培养全球语言能力
+    </text>
+
+    <!-- === SEAL/STAMP ACCENT === -->
+    <g transform="translate(0, 48)">
+      <!-- Red seal circle -->
+      <circle cx="0" cy="0" r="36" fill="none" stroke="url(#redGrad)" stroke-width="2.5" opacity="0.8" />
+      <circle cx="0" cy="0" r="31" fill="none" stroke="url(#gold)" stroke-width="0.8" opacity="0.4" />
+
+      <!-- Character inside seal -->
+      <text x="0" y="3" text-anchor="middle" dominant-baseline="central"
+            font-family="'STKaiti', 'KaiTi', 'SimSun', serif" font-size="22"
+            fill="url(#redGrad)" font-weight="bold">望</text>
+
+      <!-- Small decorative triangles at compass points -->
+      <path d="M -3 -36 L 0 -40 L 3 -36 Z" fill="url(#gold)" opacity="0.5" />
+      <path d="M -3 36 L 0 40 L 3 36 Z" fill="url(#gold)" opacity="0.5" />
+      <path d="M -36 -3 L -40 0 L -36 3 Z" fill="url(#gold)" opacity="0.5" />
+      <path d="M 36 -3 L 40 0 L 36 3 Z" fill="url(#gold)" opacity="0.5" />
+    </g>
+
+    <!-- === SCHOOL NAME SUBTITLE === -->
+    <text x="0" y="105" text-anchor="middle"
+          font-family="'Raleway', Arial, Helvetica, sans-serif" font-size="9"
+          fill="#aaa" font-weight="500" letter-spacing="5" opacity="0.6">
+      HOPE CHINESE CHARTER SCHOOL
+    </text>
+
+    <text x="0" y="120" text-anchor="middle"
+          font-family="'KaiTi', 'STKaiti', SimSun, FangSong, serif" font-size="8"
+          fill="#888" letter-spacing="3" opacity="0.4">
+      希望中文特许学校 · 波特兰
+    </text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- BOTTOM FOLD SHADOW                         -->
+  <!-- ========================================== -->
+  <path d="
+    M 90 590
+    C 96 610, 110 620, 130 620
+    L 470 620
+    C 490 620, 504 610, 510 590
+  " fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="2" />
+
+  <!-- ========================================== -->
+  <!-- WATERMARK                                   -->
+  <!-- ========================================== -->
+  <text x="300" y="678" text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif" font-size="7"
+        fill="#666" letter-spacing="4" opacity="0.35">
+    HCCS MERCH · CONCEPT
+  </text>
+</svg>

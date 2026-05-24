@@ -1,0 +1,14 @@
+Subject: Re: BlackSwan Barbell paper
+
+Hi [name],
+
+Short version: it's not a new idea — it's Taleb's barbell concept applied with LEAP calls instead of OTM options, and the authors did the most thorough backtest I've seen (7 asset classes, 17 years, plus out-of-sample COVID crash validation).
+
+That said, there's a big caveat: the backtest (2002-2019) rode a 40-year bond bull market where 7-10 year Treasuries averaged 4-5% a year. If you run this through 2022 — when both stocks and bonds got crushed — the "bond floor" evaporates and the strategy barely holds up.
+
+Worth reading if you're interested in tail-risk hedging. The implementation is sound. Just don't assume the -14% max drawdown holds in every regime.
+
+Happy to discuss more if you want.
+
+Best,
+George

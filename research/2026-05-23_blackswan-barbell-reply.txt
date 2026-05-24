@@ -1,0 +1,16 @@
+Subject: Re: BlackSwan Barbell paper
+
+Dane,
+
+You're exactly right — and that's actually the more interesting question than the paper itself. What happens when the "safe" asset isn't safe anymore? 2022 answered that pretty brutally.
+
+Your instinct about flipping it is worth exploring. A "reverse barbell" — long OTM puts on the Mag 7 (or QQQ) + short-duration Treasuries or TIPS — is essentially a tail-risk hedge for the regime we're actually in. The problem is execution: OTM puts decay fast, and you'd need to get the timing right on both legs. That's a lot harder than the original paper's set-it-and-forget-it with deep ITM calls.
+
+The cleaner version might be pairing short-duration TIPS (or floating rate notes) with long VIX calls or put spreads on QQQ — you get the bond floor without duration risk, and the tail hedge is cheaper than holding puts continuously.
+
+But honestly, nobody has cracked this yet in a systematic way. The original paper worked because the regime was stable. Your idea works in theory but would get eaten alive by theta in practice.
+
+Enjoy the summer. Say hi to the Grand Ronde crew.
+
+Best,
+George

@@ -1,0 +1,15 @@
+# Sensitive credentials
+client_secret_*.json
+*.apps.googleusercontent.com.json
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Temporary worktrees
+.claude/worktrees/
+
+# Large binary files
+*.m4a
+*.wav
+*.opus

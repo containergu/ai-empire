@@ -1,0 +1,259 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 600" width="100%" height="100%">
+  <defs>
+    <!-- 3D Cylindrical Ceramic Body Gradient -->
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6e1a0b" />
+      <stop offset="6%" stop-color="#8a2412" />
+      <stop offset="14%" stop-color="#bf311a" />
+      <stop offset="22%" stop-color="#d9452a" />
+      <stop offset="35%" stop-color="#e05030" />
+      <stop offset="50%" stop-color="#bf311a" />
+      <stop offset="72%" stop-color="#9e2816" />
+      <stop offset="100%" stop-color="#541005" />
+    </linearGradient>
+
+    <!-- Specular Highlight (ceramic glaze shine overlay) -->
+    <linearGradient id="specular" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0)" />
+      <stop offset="11%" stop-color="rgba(255,255,255,0.06)" />
+      <stop offset="16%" stop-color="rgba(255,255,255,0.55)" />
+      <stop offset="21%" stop-color="rgba(255,255,255,0.12)" />
+      <stop offset="30%" stop-color="rgba(255,255,255,0.03)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </linearGradient>
+
+    <!-- Gold Foil Text & Accent Gradient -->
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0d800" />
+      <stop offset="20%" stop-color="#fff8cc" />
+      <stop offset="40%" stop-color="#d4b84a" />
+      <stop offset="55%" stop-color="#f4dc00" />
+      <stop offset="75%" stop-color="#c9a84c" />
+      <stop offset="100%" stop-color="#f0d800" />
+    </linearGradient>
+
+    <!-- Rim Ceramic Gradient -->
+    <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#541005" />
+      <stop offset="12%" stop-color="#9e2816" />
+      <stop offset="35%" stop-color="#d9452a" />
+      <stop offset="55%" stop-color="#bf311a" />
+      <stop offset="80%" stop-color="#9e2816" />
+      <stop offset="100%" stop-color="#541005" />
+    </linearGradient>
+
+    <!-- Ground Shadow -->
+    <radialGradient id="shadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(0,0,0,0.35)" />
+      <stop offset="40%" stop-color="rgba(0,0,0,0.12)" />
+      <stop offset="100%" stop-color="rgba(0,0,0,0)" />
+    </radialGradient>
+
+    <!-- Interior Depth Gradient -->
+    <radialGradient id="interior" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0d0200" />
+      <stop offset="60%" stop-color="#1a0400" />
+      <stop offset="100%" stop-color="#2a0802" />
+    </radialGradient>
+  </defs>
+
+  <!-- ========================================== -->
+  <!-- GROUND SHADOW                               -->
+  <!-- ========================================== -->
+  <ellipse cx="240" cy="550" rx="190" ry="26" fill="url(#shadow)" />
+
+  <!-- ========================================== -->
+  <!-- HANDLE                                      -->
+  <!-- ========================================== -->
+  <!-- Handle main body -->
+  <path d="M 410 200
+           C 520 178, 540 330, 518 410
+           C 502 462, 462 482, 392 458"
+        fill="none" stroke="url(#bodyGrad)" stroke-width="28" stroke-linecap="round" />
+
+  <!-- Handle dark inner core (shows handle thickness) -->
+  <path d="M 410 200
+           C 520 178, 540 330, 518 410
+           C 502 462, 462 482, 392 458"
+        fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="28" stroke-linecap="round"
+        stroke-dasharray="200 900" />
+
+  <!-- Handle specular highlight rim -->
+  <path d="M 422 218
+           C 506 200, 522 328, 502 397"
+        fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="5" stroke-linecap="round" />
+
+  <!-- Handle attachment shadow (top) -->
+  <ellipse cx="408" cy="210" rx="18" ry="10" fill="rgba(0,0,0,0.2)"
+           transform="rotate(-15, 408, 210)" />
+
+  <!-- Handle attachment shadow (bottom) -->
+  <ellipse cx="394" cy="452" rx="16" ry="9" fill="rgba(0,0,0,0.2)"
+           transform="rotate(20, 394, 452)" />
+
+  <!-- ========================================== -->
+  <!-- MUG BODY                                    -->
+  <!-- ========================================== -->
+  <path d="
+    M 85 130
+    A 165 28 0 0 1 415 130
+    C 418 250, 408 380, 388 515
+    A 135 18 0 0 0 112 515
+    C 92 380, 82 250, 85 130
+    Z
+  " fill="url(#bodyGrad)" />
+
+  <!-- ========================================== -->
+  <!-- RIM                                         -->
+  <!-- ========================================== -->
+  <!-- Rim outer surface -->
+  <ellipse cx="250" cy="130" rx="165" ry="28" fill="url(#rimGrad)" />
+
+  <!-- Rim top edge highlight -->
+  <ellipse cx="250" cy="129" rx="158" ry="24" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+
+  <!-- Interior opening -->
+  <ellipse cx="250" cy="130" rx="150" ry="22" fill="url(#interior)" />
+
+  <!-- Interior depth shadow -->
+  <ellipse cx="250" cy="127" rx="140" ry="16" fill="rgba(0,0,0,0.6)" />
+
+  <!-- Mug rim bottom edge shadow -->
+  <path d="
+    M 85 140
+    C 85 152, 415 152, 415 140
+  " fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" />
+
+  <!-- ========================================== -->
+  <!-- BOTTOM EDGE                                 -->
+  <!-- ========================================== -->
+  <path d="
+    M 112 515
+    A 135 18 0 0 0 388 515
+    L 386 520
+    A 135 18 0 0 1 114 520
+    Z
+  " fill="rgba(0,0,0,0.2)" />
+
+  <!-- ========================================== -->
+  <!-- DESIGN ON MUG                               -->
+  <!-- ========================================== -->
+
+  <!-- Top Decorative Divider -->
+  <g opacity="0.6">
+    <line x1="160" y1="182" x2="225" y2="182" stroke="url(#gold)" stroke-width="0.7" />
+    <polygon points="250,178 254,182 250,186 246,182" fill="url(#gold)" />
+    <line x1="275" y1="182" x2="340" y2="182" stroke="url(#gold)" stroke-width="0.7" />
+  </g>
+
+  <!-- School Name - English -->
+  <text x="250" y="168" text-anchor="middle"
+        font-family="'Raleway', Arial, Helvetica, sans-serif" font-size="14"
+        fill="url(#gold)" font-weight="700" letter-spacing="5" opacity="0.95">
+    HOPE CHINESE CHARTER SCHOOL
+  </text>
+
+  <!-- School Name - Chinese -->
+  <text x="250" y="202" text-anchor="middle"
+        font-family="'KaiTi', 'STKaiti', SimSun, FangSong, serif" font-size="14"
+        fill="url(#gold)" letter-spacing="4" opacity="0.85">
+    希望中文特许学校
+  </text>
+
+  <!-- Tagline -->
+  <text x="250" y="220" text-anchor="middle"
+        font-family="'Raleway', Arial, Helvetica, sans-serif" font-size="7.5"
+        fill="url(#gold)" font-weight="400" letter-spacing="3.5" opacity="0.55">
+    中英双语 · K-8 DUAL IMMERSION
+  </text>
+
+  <!-- ================================ -->
+  <!-- MAIN CHINESE SEAL / STAMP        -->
+  <!-- ================================ -->
+  <g transform="translate(250, 375)">
+    <!-- Outer thick ring -->
+    <circle cx="0" cy="0" r="80" fill="none" stroke="url(#gold)" stroke-width="3.5" opacity="0.85" />
+
+    <!-- Second outer ring -->
+    <circle cx="0" cy="0" r="74" fill="none" stroke="url(#gold)" stroke-width="1" opacity="0.5" />
+
+    <!-- North/South/East/West decorative tabs -->
+    <path d="M -3 -80 L -3 -90 L 3 -90 L 3 -80 Z" fill="url(#gold)" rx="1" opacity="0.65" />
+    <path d="M -3 80 L -3 90 L 3 90 L 3 80 Z" fill="url(#gold)" rx="1" opacity="0.65" />
+    <path d="M -80 -3 L -90 -3 L -90 3 L -80 3 Z" fill="url(#gold)" rx="1" opacity="0.65" />
+    <path d="M 80 -3 L 90 -3 L 90 3 L 80 3 Z" fill="url(#gold)" rx="1" opacity="0.65" />
+
+    <!-- Mid ring -->
+    <circle cx="0" cy="0" r="64" fill="none" stroke="url(#gold)" stroke-width="0.8" opacity="0.4" />
+
+    <!-- Dashed decorative ring -->
+    <circle cx="0" cy="0" r="57" fill="none" stroke="url(#gold)" stroke-width="0.5"
+            stroke-dasharray="3,6" opacity="0.35" />
+
+    <!-- Small accent dots at intercardinal positions -->
+    <circle cx="40.5" cy="-40.5" r="2.5" fill="url(#gold)" opacity="0.45" />
+    <circle cx="-40.5" cy="-40.5" r="2.5" fill="url(#gold)" opacity="0.45" />
+    <circle cx="40.5" cy="40.5" r="2.5" fill="url(#gold)" opacity="0.45" />
+    <circle cx="-40.5" cy="40.5" r="2.5" fill="url(#gold)" opacity="0.45" />
+
+    <!-- Inner decorative arcs (cloud-corner motif) -->
+    <path d="M 28 -42 A 52 52 0 0 1 42 -28" fill="none" stroke="url(#gold)" stroke-width="0.8" opacity="0.3" />
+    <path d="M -28 -42 A 52 52 0 0 0 -42 -28" fill="none" stroke="url(#gold)" stroke-width="0.8" opacity="0.3" />
+    <path d="M 28 42 A 52 52 0 0 0 42 28" fill="none" stroke="url(#gold)" stroke-width="0.8" opacity="0.3" />
+    <path d="M -28 42 A 52 52 0 0 1 -42 28" fill="none" stroke="url(#gold)" stroke-width="0.8" opacity="0.3" />
+
+    <!-- Inner seal ring -->
+    <circle cx="0" cy="0" r="44" fill="none" stroke="url(#gold)" stroke-width="0.6" opacity="0.35" />
+
+    <!-- Central character: 望 (Hope) in seal-script style -->
+    <text x="0" y="4" text-anchor="middle" dominant-baseline="central"
+          font-family="'STKaiti', 'KaiTi', 'SimSun', serif" font-size="36"
+          fill="url(#gold)" font-weight="bold" opacity="0.92">望</text>
+
+    <!-- Pinyin / Meaning label below -->
+    <text x="0" y="42" text-anchor="middle"
+          font-family="'Raleway', Arial, sans-serif" font-size="7"
+          fill="url(#gold)" font-weight="500" letter-spacing="2.5" opacity="0.5">
+      HOPE
+    </text>
+
+    <!-- Established year above -->
+    <text x="0" y="-45" text-anchor="middle"
+          font-family="'Raleway', Arial, sans-serif" font-size="6.5"
+          fill="url(#gold)" font-weight="400" letter-spacing="1.5" opacity="0.4">
+      EST. 2008
+    </text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- BOTTOM LOCATION TEXT                       -->
+  <!-- ========================================== -->
+  <text x="250" y="470" text-anchor="middle"
+        font-family="'Raleway', Arial, sans-serif" font-size="7.5"
+        fill="url(#gold)" font-weight="400" letter-spacing="4.5" opacity="0.45">
+    BEAVERTON · PORTLAND · OREGON
+  </text>
+
+  <!-- ========================================== -->
+  <!-- SPECULAR GLAZE OVERLAY                     -->
+  <!-- Applied over design to simulate ceramic     -->
+  <!-- glaze/glass shine effect                    -->
+  <!-- ========================================== -->
+  <path d="
+    M 85 130
+    A 165 28 0 0 1 415 130
+    C 418 250, 408 380, 388 515
+    A 135 18 0 0 0 112 515
+    C 92 380, 82 250, 85 130
+    Z
+  " fill="url(#specular)" pointer-events="none" />
+
+  <!-- ========================================== -->
+  <!-- WATERMARK                                   -->
+  <!-- ========================================== -->
+  <text x="250" y="588" text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif" font-size="7"
+        fill="#aaa" letter-spacing="4" opacity="0.35">
+    HCCS MERCH · CONCEPT
+  </text>
+</svg>
