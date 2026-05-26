@@ -1,0 +1,14 @@
+{
+  "appId": "com.aiempire.game",
+  "appName": "AI Empire",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "AdMob": {
+      "admobIOSAppId": "ca-app-pub-3940256099942544~1458002511",
+      "admobAndroidAppId": "ca-app-pub-3940256099942544~3347511713"
+    }
+  }
+}
