@@ -1,0 +1,2211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#4A90D9">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>AI Empire TD - AI帝国塔防</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
+html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;touch-action:manipulation}
+#app{position:relative;width:100%;height:100%;padding-bottom:0;transition:padding-bottom .3s}
+#app.has-banner{padding-bottom:50px}
+#gameCanvas{display:block;width:100%;height:100%;touch-action:none}
+#bannerAd{position:fixed;bottom:0;left:0;width:100%;height:50px;background:#1a1a2e;color:#666;display:flex;align-items:center;justify-content:center;font-size:11px;z-index:100;border-top:1px solid #333}
+#bannerAd.active{background:#f0ebe3;color:#aaa}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="gameCanvas"></canvas>
+  <div id="bannerAd" class="hidden">[ AdMob Banner 广告位 ]</div>
+</div>
+<script>
+// ========================================================================
+// AI EMPIRE TD — Tower Defense Game
+// ========================================================================
+
+// ==================== CONFIG ====================
+const CELL = 40;
+const GW = 800, GH = 600;
+const COLS = GW/CELL, ROWS = GH/CELL;
+const SAVE_KEY = 'ai_empire_td_v2';
+
+// ==================== LANGUAGE ====================
+const LANG = {
+  zh: {
+    title:'AI 帝国塔防', subtitle:'AI Empire Tower Defense',
+    start:'开始游戏', footer:'涂鸦风格 · 放置炮塔 · 阻止 AI 失控',
+    heroes:'👆 皮衣教主 · 火箭侠 · 奥特曼',
+    selectLevel:'选择关卡', back:'← 返回', star:'⭐', locked:'🔒',
+    mapG:'硅谷车库', mapF:'深圳工厂', mapC:'云端之战',
+    mapGF:'🗺️ 硅谷车库', mapFF:'🗺️ 深圳工厂 (5⭐解锁)', mapCF:'🗺️ 云端之战 (15⭐解锁)',
+    lives:'❤️', money:'💰', wave:'🌊', kills:'💀',
+    tNames:['GPU 炮塔','防火墙','数据矿机','神经网络','Transformer'],
+    tDescs:['基础防御','减速敌人','备战产出金钱','范围伤害','超远距离打击'],
+    dmg:'伤害:', rng:'范围:', sell:'💰', rate:'攻速:', effect:'效果:', cost:'费用:',
+    ability:'技能', startWave:'开始波次 ▶', nextWave:'下一波 ▶',
+    getReady:'准备迎战!', waveComplete:'波次完成 +',
+    gameOver:'游戏结束', aiLost:'AI 失控了... 杀了', enemies:'个敌人',
+    retry:'重试', menu:'菜单', adRevive:'📺 看广告复活',
+    levelComplete:'关卡完成!', livesLeft:'剩余生命:', kills2:'击杀:',
+    gold:'金币:', totalStars:'总星数:', cont:'继续',
+    tutorial:[
+      '欢迎来到 AI 帝国塔防！\n点击下方 🖥️ GPU 炮塔，然后点击地图上高亮的格子放置。',
+      '干得漂亮！点击另一个高亮位置再放一个炮塔。',
+      '炮塔会自动攻击敌人！点击屏幕继续。',
+      '下方 ⚡ 按钮是英雄技能！点击使用英雄技能！',
+      '在波次间隙可以选中炮塔升级或出售。\n准备迎战 Boss！',
+    ],
+    tapToCont:'点击继续 ▸',
+    heroName:['皮衣教主','火箭侠','奥特曼'],
+    heroActive:['CUDA 风暴','超回路','世界币空投'],
+    heroPassive:['张量核心：附近炮塔攻速+20%','规模经济：升级费用-15%','AGI 初始化：新炮塔初始Lv.1'],
+    heroSelectTitle:'选择英雄', heroOwned:'已拥有', heroBuy:'购买', heroEquip:'装备', heroSelected:'已装备',
+    eBug:'Bug', eVirus:'病毒', eBadModel:'坏模型', eReg:'监管', eBoss:'AGI Boss',
+    maxLv:'MAX', level:'Lv.', lvComplete:'关卡完成!',
+    langEn:'English', langZh:'中文',
+    selectHero:'选择英雄',
+  },
+  en: {
+    title:'AI Empire TD', subtitle:'Tower Defense',
+    start:'Start Game', footer:'Doodle Style · Place Towers · Stop AI',
+    heroes:'👆 Jensen Huang · Elon Musk · Sam Altman',
+    selectLevel:'Select Level', back:'← Back', star:'⭐', locked:'🔒',
+    mapG:'Silicon Garage', mapF:'Shenzhen Factory', mapC:'Cloud Battle',
+    mapGF:'🗺️ Silicon Garage', mapFF:'🗺️ Shenzhen Factory (5⭐)', mapCF:'🗺️ Cloud Battle (15⭐)',
+    lives:'❤️', money:'💰', wave:'🌊', kills:'💀',
+    tNames:['GPU Tower','Firewall','Data Miner','Neural Net','Transformer'],
+    tDescs:['Basic defense','Slows enemies','Generates gold','Splash damage','Long range'],
+    dmg:'DMG:', rng:'RNG:', sell:'💰', rate:'Rate:', effect:'Effect:', cost:'Cost:',
+    ability:'Ability', startWave:'Start Wave ▶', nextWave:'Next Wave ▶',
+    getReady:'Get Ready!', waveComplete:'Wave Complete +',
+    gameOver:'GAME OVER', aiLost:'AI lost control... killed', enemies:'enemies',
+    retry:'Retry', menu:'Menu', adRevive:'📺 Watch Ad to Revive',
+    levelComplete:'Level Complete!', livesLeft:'Lives:', kills2:'Kills:',
+    gold:'Gold:', totalStars:'Total Stars:', cont:'Continue',
+    tutorial:[
+      'Welcome to AI Empire TD!\nTap 🖥️ GPU Tower below, then tap a highlighted cell.',
+      'Nice! Place another tower on a highlighted spot.',
+      'Towers auto-attack enemies! Tap to continue.',
+      'Tap ⚡ to use your hero ability!',
+      'Between waves, tap towers to upgrade or sell.\nPrepare for the Boss!',
+    ],
+    tapToCont:'Tap to continue ▸',
+    heroName:['Jensen Huang','Elon Musk','Sam Altman'],
+    heroActive:['CUDA Storm','Hyperloop','Worldcoin Drop'],
+    heroPassive:['Tensor Core: +20% fire rate for nearby towers','Economy of Scale: -15% upgrade cost','AGI Init: New towers start at Lv.1'],
+    heroSelectTitle:'Select Hero', heroOwned:'Owned', heroBuy:'Buy', heroEquip:'Equip', heroSelected:'Equipped',
+    eBug:'Bug', eVirus:'Virus', eBadModel:'Bad Model', eReg:'Regulation', eBoss:'AGI Boss',
+    maxLv:'MAX', level:'Lv.', lvComplete:'Level Complete!',
+    langEn:'English', langZh:'中文',
+    selectHero:'Select Hero',
+  },
+};
+let lang = 'zh';
+let _langBtn = null;
+function T(key) { return (LANG[lang]&&LANG[lang][key])||key; }
+function toggleLang() {
+  lang = lang === 'zh' ? 'en' : 'zh';
+  saveData.lang = lang;
+  document.title = lang === 'zh' ? 'AI Empire TD - AI帝国塔防' : 'AI Empire TD';
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(saveData)); } catch(e) {}
+}
+
+// ==================== CANVAS ====================
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let scaleFactor = 1, offX = 0, offY = 0;
+
+function resizeCanvas() {
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+  const sx = canvas.width / GW, sy = canvas.height / GH;
+  scaleFactor = Math.min(sx, sy);
+  offX = (canvas.width - GW * scaleFactor) / 2;
+  offY = (canvas.height - GH * scaleFactor) / 2;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// ==================== STATE ====================
+let G = {}; // global game state
+let state = 'MENU';
+const _stateEnter = {};
+
+function setState(s) {
+  state = s;
+  if (_stateEnter[s]) _stateEnter[s]();
+}
+
+// ==================== SAVE ====================
+const defaultSave = {
+  unlocked: [true],
+  stars: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  totalStars: 0,
+  money: 0,
+  tutorialDone: false,
+  lang: 'zh',
+  ownedHeroes: ['jensen'],
+  activeHero: 'jensen',
+};
+let saveData = { ...defaultSave };
+
+function saveGame() {
+  saveData.totalStars = saveData.stars.reduce((a,b)=>a+b,0);
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(saveData)); } catch(e) {}
+}
+function loadGame() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (raw) { saveData = { ...defaultSave, ...JSON.parse(raw) }; lang = saveData.lang || 'zh'; return true; }
+  } catch(e) {}
+  return false;
+}
+
+// ==================== UTILITY ====================
+function lerp(a,b,t) { return a + (b-a)*t; }
+function dist(x1,y1,x2,y2) { return Math.hypot(x2-x1,y2-y1); }
+function clamp(v,min,max) { return Math.max(min,Math.min(max,v)); }
+function rand(min,max) { return min + Math.random() * (max-min); }
+
+function fmt(n) {
+  if (n < 10000) return '' + Math.floor(n);
+  if (n < 1e6) return (n/1e3).toFixed(1) + 'K';
+  return (n/1e6).toFixed(1) + 'M';
+}
+
+// ==================== DOODLE DRAWING ====================
+function dLine(x1,y1,x2,y2,color='#2d2d2d',w=3) {
+  ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=w; ctx.lineCap='round';
+  const steps = Math.max(4, Math.floor(Math.hypot(x2-x1,y2-y1)/10));
+  ctx.beginPath();
+  for (let i=0;i<=steps;i++) {
+    const t=i/steps;
+    const x=x1+(x2-x1)*t+(i>0&&i<steps?(Math.random()-0.5)*2:0);
+    const y=y1+(y2-y1)*t+(i>0&&i<steps?(Math.random()-0.5)*2:0);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke(); ctx.restore();
+}
+
+function dRect(x,y,w,h,stroke='#2d2d2d',fill=null) {
+  if (fill) { ctx.fillStyle=fill; ctx.fillRect(x,y,w,h); }
+  dLine(x,y,x+w,y,stroke); dLine(x+w,y,x+w,y+h,stroke);
+  dLine(x+w,y+h,x,y+h,stroke); dLine(x,y+h,x,y,stroke);
+}
+
+function dCircle(cx,cy,r,stroke='#2d2d2d',fill=null) {
+  ctx.save();
+  if (fill) { ctx.fillStyle=fill; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); }
+  ctx.strokeStyle=stroke; ctx.lineWidth=2.5; ctx.lineCap='round';
+  const steps = Math.max(8,Math.floor(r));
+  ctx.beginPath();
+  for (let i=0;i<=steps;i++) {
+    const t=i/steps, a=t*Math.PI*2;
+    const wob=i>0&&i<steps?(Math.random()-0.5)*1.5:0;
+    const x=cx+(r+wob)*Math.cos(a), y=cy+(r+wob)*Math.sin(a);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.closePath(); ctx.stroke(); ctx.restore();
+}
+
+function dRoundRect(x,y,w,h,r,fill,stroke) {
+  ctx.save();
+  if (fill) { ctx.fillStyle=fill; ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.fill(); }
+  if (stroke) { ctx.strokeStyle=stroke; ctx.lineWidth=2; ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.stroke(); }
+  ctx.restore();
+}
+
+// ==================== MAPS ====================
+const MAPS = {
+  garage: {
+    id:'garage', name:'硅谷车库', diff:'简单',
+    bg:'#f5f0e8', pathC:'#d4c9b8',
+    path:[
+      {x:0,y:520},{x:160,y:520},{x:160,y:160},{x:400,y:160},
+      {x:400,y:400},{x:640,y:400},{x:640,y:520},{x:800,y:520}
+    ],
+    spawn:{x:0,y:520}, exit:{x:800,y:520},
+    zones:[
+      {x1:2,y1:5,x2:5,y2:9},{x1:2,y1:1,x2:5,y2:3},
+      {x1:7,y1:1,x2:12,y2:3},{x1:7,y1:8,x2:12,y2:12},
+      {x1:14,y1:5,x2:17,y2:9},{x1:14,y1:1,x2:17,y2:3},
+    ],
+    heroSpot:{x:280,y:280},
+    obstacles:[], doodle:drawGarageDoodles,
+  },
+  factory: {
+    id:'factory', name:'深圳工厂', diff:'普通',
+    bg:'#fff8e1', pathC:'#e0d5c8',
+    path:[
+      {x:0,y:160},{x:200,y:160},{x:200,y:440},{x:600,y:440},
+      {x:600,y:160},{x:800,y:160}
+    ],
+    spawn:{x:0,y:160}, exit:{x:800,y:160},
+    zones:[
+      {x1:2,y1:0,x2:4,y2:3},{x1:6,y1:0,x2:12,y2:3},
+      {x1:6,y1:7,x2:12,y2:12},{x1:14,y1:7,x2:17,y2:12},
+      {x1:14,y1:0,x2:17,y2:3},
+    ],
+    heroSpot:{x:400,y:300},
+    obstacles:[], doodle:drawFactoryDoodles,
+  },
+  cloud: {
+    id:'cloud', name:'云端之战', diff:'困难',
+    bg:'#e3f2fd', pathC:'#bbdefb',
+    path:[
+      {x:0,y:80},{x:160,y:80},{x:160,y:520},{x:400,y:520},
+      {x:400,y:80},{x:640,y:80},{x:640,y:520},{x:800,y:520}
+    ],
+    spawn:{x:0,y:80}, exit:{x:800,y:520},
+    zones:[
+      {x1:2,y1:3,x2:5,y2:5},{x1:2,y1:8,x2:5,y2:12},
+      {x1:7,y1:8,x2:12,y2:12},{x1:7,y1:1,x2:12,y2:5},
+      {x1:14,y1:3,x2:17,y2:5},{x1:14,y1:8,x2:17,y2:12},
+    ],
+    heroSpot:{x:400,y:300},
+    obstacles:[], doodle:drawCloudDoodles,
+  }
+};
+
+// Precompute path cells for each map
+for (const key in MAPS) {
+  const m = MAPS[key];
+  const cells = new Set();
+  for (let i=0;i<m.path.length-1;i++) {
+    const a=m.path[i], b=m.path[i+1];
+    const len = Math.ceil(dist(a.x,a.y,b.x,b.y));
+    for (let s=0;s<=len;s++) {
+      const t=s/len, gx=Math.floor(lerp(a.x,b.x,t)/CELL), gy=Math.floor(lerp(a.y,b.y,t)/CELL);
+      cells.add(gx+','+gy);
+      cells.add((gx+1)+','+gy);
+      cells.add(gx+','+(gy+1));
+    }
+  }
+  m.pathCells = cells;
+}
+
+// ==================== TOWERS ====================
+const TOWER_TYPES = [
+  { id:'gpu', name:'GPU 炮塔', icon:'🖥️', cost:[80,160,320],
+    dmg:[12,25,50], range:[90,110,130], rate:[0.8,0.7,0.6],
+    effect:null, desc:'基础防御', color:'#4A90D9' },
+  { id:'firewall', name:'防火墙', icon:'🛡️', cost:[60,120,240],
+    dmg:[8,16,32], range:[80,100,120], rate:[1.0,0.9,0.8],
+    effect:'slow', slowAmount:0.4, desc:'减速敌人', color:'#00C853' },
+  { id:'miner', name:'数据矿机', icon:'⛏️', cost:[100,200,400],
+    dmg:[5,10,20], range:[70,90,110], rate:[1.5,1.3,1.1],
+    effect:'income', income:[5,12,25], desc:'备战期间产出金钱', color:'#FFD600' },
+  { id:'neural', name:'神经网络', icon:'🧠', cost:[150,300,600],
+    dmg:[20,40,80], range:[100,120,140], rate:[1.2,1.0,0.9],
+    effect:'splash', splashR:[30,40,50], desc:'范围伤害', color:'#E040FB' },
+  { id:'transformer', name:'Transformer', icon:'📡', cost:[200,400,800],
+    dmg:[35,70,140], range:[160,190,220], rate:[1.5,1.3,1.2],
+    effect:'laser', desc:'超远距离打击', color:'#FF6D00' },
+];
+
+// ==================== ENEMIES ====================
+const ENEMY_TYPES = {
+  bug: { hp:60, speed:60, reward:10, color:'#E53935', size:10, nameKey:'eBug' },
+  virus: { hp:100, speed:80, reward:15, color:'#8E24AA', size:12, nameKey:'eVirus' },
+  badModel: { hp:200, speed:40, reward:20, color:'#FB8C00', size:14, nameKey:'eBadModel' },
+  regulation: { hp:400, speed:30, reward:30, color:'#546E7A', size:16, nameKey:'eReg' },
+  agi: { hp:1000, speed:50, reward:100, color:'#D50000', size:22, nameKey:'eBoss' },
+};
+
+// ==================== HEROES ====================
+const HERO_TYPES = [
+  { id:'jensen', cost:0, color:'#4A90D9',
+    activeCD:20, activeDmg:0, activeRadius:120,
+    atkDmg:10, atkRange:110, atkRate:0.8,
+    passiveDesc:'aura',
+    shipDesc:'Towers near hero +20% fire rate',
+  },
+  { id:'musk', cost:3000, color:'#FF6D00',
+    activeCD:18, activeDmg:0, activeRadius:0,
+    atkDmg:6, atkRange:90, atkRate:0.5,
+    passiveDesc:'costReduce',
+    shipDesc:'Upgrade costs -15%',
+  },
+  { id:'altman', cost:5000, color:'#00C853',
+    activeCD:15, activeDmg:0, activeRadius:0,
+    atkDmg:14, atkRange:150, atkRate:1.2,
+    passiveDesc:'startLv1',
+    shipDesc:'New towers start at level 1 (max 5)',
+  },
+];
+
+// ==================== LEVELS ====================
+const LEVELS = [
+  // Map 1: Garage — 5 levels
+  { map:'garage', money:100, tutorial:true, starReq:[17,12,5],
+    waves:[
+      [{t:'bug',c:5,i:1.2}],
+      [{t:'bug',c:8,i:1.0},{t:'badModel',c:1,i:2.0}],
+      [{t:'bug',c:10,i:0.9},{t:'badModel',c:2,i:1.8}],
+      [{t:'bug',c:12,i:0.8},{t:'badModel',c:3,i:1.5}],
+      [{t:'bug',c:8,i:0.7},{t:'badModel',c:4,i:1.2},{t:'agi',c:1,i:3.0}],
+    ]},
+  { map:'garage', money:120, starReq:[17,12,5],
+    waves:[
+      [{t:'bug',c:8,i:1.0},{t:'virus',c:2,i:1.5}],
+      [{t:'bug',c:10,i:0.9},{t:'virus',c:3,i:1.3}],
+      [{t:'virus',c:6,i:1.0},{t:'badModel',c:3,i:1.5}],
+      [{t:'bug',c:15,i:0.7},{t:'badModel',c:5,i:1.2}],
+      [{t:'virus',c:8,i:0.8},{t:'badModel',c:4,i:1.0},{t:'agi',c:1,i:3.0}],
+    ]},
+  { map:'garage', money:140, starReq:[16,11,5],
+    waves:[
+      [{t:'virus',c:8,i:0.9},{t:'badModel',c:3,i:1.5}],
+      [{t:'bug',c:12,i:0.8},{t:'virus',c:5,i:1.2}],
+      [{t:'badModel',c:8,i:1.0},{t:'regulation',c:1,i:2.0}],
+      [{t:'virus',c:10,i:0.8},{t:'regulation',c:2,i:1.5}],
+      [{t:'badModel',c:6,i:0.9},{t:'regulation',c:3,i:1.2},{t:'agi',c:1,i:3.0}],
+    ]},
+  { map:'garage', money:160, starReq:[16,11,5],
+    waves:[
+      [{t:'bug',c:20,i:0.6},{t:'virus',c:5,i:1.0}],
+      [{t:'virus',c:10,i:0.8},{t:'badModel',c:6,i:1.2}],
+      [{t:'badModel',c:8,i:0.9},{t:'regulation',c:3,i:1.5}],
+      [{t:'regulation',c:5,i:1.2},{t:'virus',c:12,i:0.7}],
+      [{t:'bug',c:15,i:0.5},{t:'regulation',c:4,i:1.0},{t:'agi',c:1,i:2.5}],
+    ]},
+  { map:'garage', money:200, starReq:[15,10,5],
+    waves:[
+      [{t:'virus',c:12,i:0.7},{t:'regulation',c:2,i:1.5}],
+      [{t:'badModel',c:10,i:0.8},{t:'regulation',c:3,i:1.2}],
+      [{t:'bug',c:25,i:0.5},{t:'virus',c:8,i:0.9}],
+      [{t:'regulation',c:6,i:1.0},{t:'badModel',c:8,i:0.8}],
+      [{t:'virus',c:10,i:0.6},{t:'regulation',c:5,i:0.9},{t:'agi',c:2,i:2.5}],
+    ]},
+  // Map 2: Factory — 5 levels
+  { map:'factory', money:150, starReq:[17,12,5],
+    waves:[
+      [{t:'bug',c:10,i:1.0},{t:'virus',c:3,i:1.5}],
+      [{t:'virus',c:8,i:0.9},{t:'badModel',c:4,i:1.3}],
+      [{t:'badModel',c:6,i:1.0},{t:'regulation',c:2,i:1.8}],
+      [{t:'bug',c:15,i:0.7},{t:'regulation',c:3,i:1.2}],
+      [{t:'virus',c:10,i:0.7},{t:'badModel',c:5,i:1.0},{t:'agi',c:1,i:3.0}],
+    ]},
+  { map:'factory', money:180, starReq:[16,11,5],
+    waves:[
+      [{t:'virus',c:10,i:0.8},{t:'badModel',c:5,i:1.2}],
+      [{t:'bug',c:20,i:0.6},{t:'virus',c:6,i:1.0}],
+      [{t:'badModel',c:8,i:0.9},{t:'regulation',c:3,i:1.3}],
+      [{t:'regulation',c:5,i:1.0},{t:'virus',c:12,i:0.7}],
+      [{t:'badModel',c:8,i:0.8},{t:'regulation',c:4,i:1.0},{t:'agi',c:1,i:2.5}],
+    ]},
+  { map:'factory', money:220, starReq:[16,11,5],
+    waves:[
+      [{t:'virus',c:12,i:0.7},{t:'regulation',c:3,i:1.2}],
+      [{t:'badModel',c:10,i:0.8},{t:'regulation',c:4,i:1.0}],
+      [{t:'bug',c:25,i:0.5},{t:'virus',c:8,i:0.8}],
+      [{t:'regulation',c:6,i:0.9},{t:'badModel',c:8,i:0.7}],
+      [{t:'virus',c:12,i:0.6},{t:'regulation',c:5,i:0.8},{t:'agi',c:2,i:2.0}],
+    ]},
+  { map:'factory', money:260, starReq:[15,10,5],
+    waves:[
+      [{t:'badModel',c:10,i:0.7},{t:'regulation',c:4,i:1.0}],
+      [{t:'virus',c:15,i:0.6},{t:'regulation',c:5,i:0.9}],
+      [{t:'bug',c:30,i:0.4},{t:'badModel',c:8,i:0.7}],
+      [{t:'regulation',c:8,i:0.8},{t:'virus',c:10,i:0.6}],
+      [{t:'bug',c:20,i:0.4},{t:'regulation',c:6,i:0.7},{t:'agi',c:2,i:2.0}],
+    ]},
+  { map:'factory', money:300, starReq:[15,10,5],
+    waves:[
+      [{t:'virus',c:15,i:0.6},{t:'badModel',c:8,i:0.8}],
+      [{t:'badModel',c:12,i:0.7},{t:'regulation',c:6,i:0.9}],
+      [{t:'regulation',c:8,i:0.7},{t:'virus',c:12,i:0.5}],
+      [{t:'bug',c:35,i:0.3},{t:'regulation',c:8,i:0.6}],
+      [{t:'badModel',c:10,i:0.5},{t:'regulation',c:6,i:0.6},{t:'agi',c:3,i:1.5}],
+    ]},
+  // Map 3: Cloud — 5 levels
+  { map:'cloud', money:200, starReq:[17,12,5],
+    waves:[
+      [{t:'virus',c:10,i:0.8},{t:'badModel',c:5,i:1.2}],
+      [{t:'badModel',c:8,i:0.9},{t:'regulation',c:3,i:1.3}],
+      [{t:'regulation',c:5,i:1.0},{t:'virus',c:12,i:0.7}],
+      [{t:'bug',c:20,i:0.5},{t:'regulation',c:5,i:0.9}],
+      [{t:'virus',c:12,i:0.6},{t:'regulation',c:5,i:0.8},{t:'agi',c:2,i:2.0}],
+    ]},
+  { map:'cloud', money:250, starReq:[16,11,5],
+    waves:[
+      [{t:'badModel',c:10,i:0.7},{t:'regulation',c:4,i:1.0}],
+      [{t:'regulation',c:6,i:0.8},{t:'virus',c:12,i:0.6}],
+      [{t:'bug',c:25,i:0.4},{t:'badModel',c:8,i:0.7}],
+      [{t:'regulation',c:8,i:0.7},{t:'virus',c:10,i:0.5}],
+      [{t:'badModel',c:10,i:0.5},{t:'regulation',c:6,i:0.6},{t:'agi',c:2,i:1.8}],
+    ]},
+  { map:'cloud', money:300, starReq:[16,11,5],
+    waves:[
+      [{t:'virus',c:15,i:0.6},{t:'regulation',c:5,i:0.9}],
+      [{t:'badModel',c:12,i:0.6},{t:'regulation',c:6,i:0.8}],
+      [{t:'regulation',c:8,i:0.7},{t:'bug',c:30,i:0.3}],
+      [{t:'virus',c:15,i:0.5},{t:'regulation',c:8,i:0.6}],
+      [{t:'regulation',c:8,i:0.5},{t:'badModel',c:10,i:0.5},{t:'agi',c:3,i:1.5}],
+    ]},
+  { map:'cloud', money:350, starReq:[15,10,5],
+    waves:[
+      [{t:'virus',c:18,i:0.5},{t:'badModel',c:10,i:0.7}],
+      [{t:'badModel',c:14,i:0.6},{t:'regulation',c:8,i:0.7}],
+      [{t:'bug',c:35,i:0.3},{t:'regulation',c:8,i:0.5}],
+      [{t:'regulation',c:10,i:0.5},{t:'virus',c:15,i:0.4}],
+      [{t:'badModel',c:12,i:0.4},{t:'regulation',c:8,i:0.4},{t:'agi',c:3,i:1.2}],
+    ]},
+  { map:'cloud', money:400, starReq:[14,10,5],
+    waves:[
+      [{t:'regulation',c:8,i:0.6},{t:'virus',c:15,i:0.5}],
+      [{t:'badModel',c:15,i:0.5},{t:'regulation',c:8,i:0.6}],
+      [{t:'bug',c:40,i:0.25},{t:'virus',c:15,i:0.4}],
+      [{t:'regulation',c:12,i:0.4},{t:'badModel',c:12,i:0.4}],
+      [{t:'virus',c:15,i:0.3},{t:'regulation',c:10,i:0.3},{t:'agi',c:4,i:1.0}],
+    ]},
+];
+
+// Unlock requirements: each map after garage needs stars
+function isLevelUnlocked(idx) {
+  return idx===0||idx===5||idx===10?saveData.unlocked[idx]||saveData.totalStars>=(idx===5?5:15):saveData.unlocked[idx]||saveData.unlocked[idx-1];
+}
+
+// ==================== GAME STATE RESET ====================
+function resetGame(levelIdx) {
+  const lv = LEVELS[levelIdx];
+  const mapId = lv.map;
+  G = {
+    levelIdx, mapId,
+    map: MAPS[mapId],
+    money: lv.money,
+    lives: 20,
+    waveIdx: 0,
+    totalWaves: lv.waves.length,
+    enemies: [],
+    towers: [],
+    projectiles: [],
+    placement: null,
+    selectedTower: null,
+    hero: {
+      x: MAPS[mapId].heroSpot.x,
+      y: MAPS[mapId].heroSpot.y,
+      type: saveData.activeHero || 'jensen',
+      activeCD: 0, specialReady: true,
+      attackCD: 0,
+      moveTarget: null,
+      dragging: false,
+      placedLv1Count: 0,
+    },
+    _heroType: null,
+    waveState: 'idle', // idle, spawning, active
+    spawnTimer: 0,
+    spawnQueue: [],
+    waveReward: 0,
+    completed: false,
+    gameOver: false,
+    placingType: null,
+    placingValid: false,
+    placingPos: null,
+    heroAbilityLocked: false,
+    speed: 1,
+    totalKills: 0,
+    tutorial: lv.tutorial && !saveData.tutorialDone,
+    tutorialStep: 0,
+    timer: 0,
+    betweenWaveTimer: 0,
+    particles: [],
+    moneyTexts: [],
+    waveComplete: false,
+    gameTime: 0,
+    _tooltipIdx: -1,
+    _hyperloopTimer: 0,
+    _hyperloopActive: false,
+    _screenFlash: 0,
+  };
+  if (G.tutorial) G.tutorialStep = 0;
+}
+
+// ==================== ENEMY ====================
+function spawnEnemy(type, hpMult) {
+  const base = ENEMY_TYPES[type];
+  const hp = base.hp * hpMult;
+  G.enemies.push({
+    x: G.map.spawn.x, y: G.map.spawn.y,
+    hp, maxHp: hp, speed: base.speed,
+    reward: base.reward, type, color: base.color, size: base.size,
+    pathIdx: 0, alive: true, reachedEnd: false,
+    slowTimer: 0, slowAmt: 0,
+    hitFlash: 0,
+  });
+}
+
+function updateEnemy(e, dt) {
+  if (!e.alive) return;
+  if (e.hitFlash > 0) e.hitFlash -= dt;
+  if (!G.map.path.length) return;
+
+  let speed = e.speed;
+  if (e.slowTimer > 0) {
+    speed *= (1 - e.slowAmt);
+    e.slowTimer -= dt;
+  }
+  const moved = speed * dt;
+
+  e.pathIdx += moved;
+  const totalLen = calcPathLength(G.map.path);
+
+  if (e.pathIdx >= totalLen) {
+    e.alive = false; e.reachedEnd = true;
+    G.lives--;
+    spawnParticles(e.x, e.y, '#ff0000', 8, 20);
+    return;
+  }
+
+  const pos = getPathPos(G.map.path, e.pathIdx);
+  e.x = pos.x; e.y = pos.y;
+}
+
+function calcPathLength(path) {
+  let total = 0;
+  for (let i=1; i<path.length; i++) total += dist(path[i-1].x, path[i-1].y, path[i].x, path[i].y);
+  return total;
+}
+
+function getPathPos(path, idx) {
+  let accumulated = 0;
+  for (let i=1; i<path.length; i++) {
+    const segLen = dist(path[i-1].x, path[i-1].y, path[i].x, path[i].y);
+    if (accumulated + segLen >= idx) {
+      const t = (idx - accumulated) / (segLen || 1);
+      return { x: lerp(path[i-1].x, path[i].x, t), y: lerp(path[i-1].y, path[i].y, t) };
+    }
+    accumulated += segLen;
+  }
+  return { x: path[path.length-1].x, y: path[path.length-1].y };
+}
+
+// ==================== TOWERS ====================
+function placeTower(type, gridX, gridY) {
+  const def = TOWER_TYPES.find(t=>t.id===type);
+  if (!def) return false;
+  const cost = def.cost[0];
+  if (G.money < cost) return false;
+  G.money -= cost;
+  const x = gridX * CELL + CELL/2;
+  const y = gridY * CELL + CELL/2;
+
+  let startLv = 0;
+  if (G.hero && G.hero.type === 'altman' && G.hero.placedLv1Count < 5) {
+    startLv = 1;
+    G.hero.placedLv1Count++;
+  }
+
+  const tower = {
+    x, y, gridX, gridY, type, level:startLv,
+    dmg: def.dmg[startLv], range: def.range[startLv], rate: def.rate[startLv],
+    cd: 0, target: null, angle: 0, effect: def.effect,
+    color: def.color, id: def.id,
+    incomeTimer: 0,
+    slowAmt: def.slowAmount || 0,
+    income: def.income ? def.income[startLv] : 0,
+    splashR: def.splashR ? def.splashR[startLv] : 0,
+    totalInvested: cost + (startLv === 1 ? def.cost[1] : 0),
+    _aura: false,
+  };
+  G.towers.push(tower);
+  spawnParticles(x, y, '#4A90D9', 6, 15);
+  return true;
+}
+
+function getUpgradeCost(t) {
+  const def = TOWER_TYPES.find(d=>d.id===t.type);
+  let cost = def.cost[t.level+1];
+  if (G.hero && G.hero.type === 'musk') cost = Math.floor(cost * 0.85);
+  return cost;
+}
+
+function upgradeTower(t) {
+  if (t.level >= 2) return false;
+  const cost = getUpgradeCost(t);
+  const def = TOWER_TYPES.find(d=>d.id===t.type);
+  if (!def) return false;
+  if (G.money < cost) return false;
+  G.money -= cost;
+  t.level++;
+  t.dmg = def.dmg[t.level];
+  t.range = def.range[t.level];
+  t.rate = def.rate[t.level];
+  t.totalInvested += cost;
+  if (def.income) t.income = def.income[t.level];
+  if (def.splashR) t.splashR = def.splashR[t.level];
+  spawnParticles(t.x, t.y, '#FFD600', 10, 20);
+  return true;
+}
+
+function sellTower(t) {
+  const refund = Math.floor(t.totalInvested * 0.5);
+  G.money += refund;
+  const idx = G.towers.indexOf(t);
+  if (idx >= 0) G.towers.splice(idx, 1);
+  spawnParticles(t.x, t.y, '#aaa', 6, 15);
+  G.selectedTower = null;
+}
+
+function updateTower(t, dt) {
+  // Miner generates income only during active waves, not between sessions
+  if (t.effect === 'income' && (G.waveState === 'spawning' || G.waveState === 'active')) {
+    t.incomeTimer += dt;
+    if (t.incomeTimer >= 1) {
+      t.incomeTimer -= 1;
+      G.money += t.income;
+      G.moneyTexts.push({ x:t.x, y:t.y-20, text:'+'+t.income, life:1, maxLife:1 });
+    }
+  }
+
+  // Jensen aura: +20% fire rate
+  let rateMult = 1;
+  if (t._aura) rateMult *= 0.8;
+  // Hyperloop: 3x speed
+  if (G._hyperloopTimer && G._hyperloopTimer > 0) rateMult *= 0.33;
+
+  t.cd -= dt * (1 / rateMult);
+  if (t.cd > 0) return;
+
+  // Find target: closest to exit
+  let best = null, bestDist = Infinity;
+  for (const e of G.enemies) {
+    if (!e.alive || e.reachedEnd) continue;
+    const d = dist(t.x, t.y, e.x, e.y);
+    if (d <= t.range && e.pathIdx < bestDist) {
+      bestDist = e.pathIdx;
+      best = e;
+    }
+  }
+
+  if (!best) { t.target = null; return; }
+
+  t.target = best;
+  t.angle = Math.atan2(best.y - t.y, best.x - t.x);
+  t.cd = t.rate;
+
+  // Fire projectile
+  const proj = {
+    x: t.x, y: t.y,
+    tx: best.x, ty: best.y,
+    target: best,
+    speed: 300,
+    dmg: t.dmg,
+    effect: t.effect,
+    alive: true,
+    color: t.color,
+    slowAmt: t.slowAmt || 0,
+    splashR: t.splashR || 0,
+    life: 0,
+    maxLife: 2,
+  };
+  G.projectiles.push(proj);
+}
+
+function updateProjectile(p, dt) {
+  if (!p.alive) return;
+  p.life += dt;
+  if (p.life > p.maxLife) { p.alive = false; return; }
+
+  // Homing
+  if (p.target && p.target.alive) {
+    p.tx = p.target.x; p.ty = p.target.y;
+  }
+
+  const d = dist(p.x, p.y, p.tx, p.ty);
+  const move = p.speed * dt;
+
+  if (d <= move) {
+    // Hit
+    p.alive = false;
+    if (p.target && p.target.alive) {
+      dealDamage(p.target, p.dmg);
+      if (p.effect === 'slow' && p.target.alive) {
+        p.target.slowTimer = 2;
+        p.target.slowAmt = p.slowAmt;
+      }
+      if (p.effect === 'splash') {
+        for (const e of G.enemies) {
+          if (e !== p.target && e.alive && dist(e.x, e.y, p.tx, p.ty) <= p.splashR) {
+            dealDamage(e, p.dmg * 0.5);
+          }
+        }
+        spawnParticles(p.tx, p.ty, '#E040FB', 12, 25);
+      }
+      spawnHitParticles(p.tx, p.ty, p.color);
+    }
+  } else {
+    p.x += (p.tx - p.x) * move / d;
+    p.y += (p.ty - p.y) * move / d;
+  }
+}
+
+function dealDamage(e, dmg) {
+  if (!e.alive) return;
+  e.hp -= dmg;
+  e.hitFlash = 0.1;
+  G.moneyTexts.push({ x:e.x, y:e.y-10, text:'-'+dmg, life:0.6, maxLife:0.6, color:'#E53935' });
+  if (e.hp <= 0) {
+    e.alive = false;
+    G.money += e.reward;
+    G.totalKills++;
+    spawnKillParticles(e.x, e.y, e.color, e.reward);
+  }
+}
+
+// ==================== HERO ====================
+function getHeroDef(id) { return HERO_TYPES.find(h=>h.id===id)||HERO_TYPES[0]; }
+
+function updateHero(dt) {
+  const h = G.hero;
+  const def = getHeroDef(h.type);
+  h.activeCD -= dt;
+  if (h.activeCD <= 0) h.specialReady = true;
+
+  // Move toward target if set
+  if (h.moveTarget) {
+    const d = dist(h.x, h.y, h.moveTarget.x, h.moveTarget.y);
+    if (d < 5) { h.moveTarget = null; }
+    else {
+      const speed = 120 * dt;
+      h.x += (h.moveTarget.x - h.x) / d * speed;
+      h.y += (h.moveTarget.y - h.y) / d * speed;
+    }
+  }
+
+  // Auto-attack: find nearest enemy in range
+  if (h.attackCD > 0) h.attackCD -= dt;
+  if (h.attackCD <= 0) {
+    let target = null, bestDist = Infinity;
+    for (const e of G.enemies) {
+      if (!e.alive || e.reachedEnd) continue;
+      const d = dist(h.x, h.y, e.x, e.y);
+      if (d <= def.atkRange && e.pathIdx < bestDist) {
+        bestDist = e.pathIdx;
+        target = e;
+      }
+    }
+    if (target) {
+      h.attackCD = def.atkRate;
+      G.projectiles.push({
+        x: h.x, y: h.y,
+        tx: target.x, ty: target.y,
+        target: target,
+        speed: 350,
+        dmg: def.atkDmg,
+        effect: 'hero',
+        alive: true,
+        color: def.color,
+        life: 0, maxLife: 1.5,
+      });
+      // Muzzle flash
+      spawnParticles(h.x, h.y, def.color, 3, 15);
+    }
+  }
+
+  // Jensen passive: aura buff for nearby towers
+  if (h.type === 'jensen') {
+    for (const t of G.towers) {
+      t._aura = dist(t.x, t.y, h.x, h.y) < 120; // 3 cells
+    }
+  }
+}
+
+function heroSpecial() {
+  const h = G.hero;
+  if (!h.specialReady || G.heroAbilityLocked) return false;
+  const def = getHeroDef(h.type);
+  h.specialReady = false;
+  h.activeCD = def.activeCD;
+  G.heroAbilityLocked = true;
+  setTimeout(() => G.heroAbilityLocked = false, 500);
+
+  const wave = G.waveIdx || 0;
+
+  if (h.type === 'jensen') {
+    // CUDA Storm: wave-scaling AoE damage
+    const dmg = 150 + wave * 30;
+    const radius = 120;
+    for (const e of G.enemies) {
+      if (e.alive && dist(h.x, h.y, e.x, e.y) < radius) {
+        dealDamage(e, dmg);
+      }
+    }
+    spawnParticles(h.x, h.y, '#4A90D9', 40, 80);
+    // Screen-wide lightning flash particles
+    for (let i=0; i<30; i++) {
+      G.particles.push({
+        x:rand(0,GW), y:rand(0,GH), vx:rand(-100,100), vy:rand(-150,-30),
+        color:'#4A90D9', size:rand(3,8), life:1, maxLife:1, alive:true,
+      });
+    }
+  } else if (h.type === 'musk') {
+    // Hyperloop: 3x tower speed for 6s
+    G._hyperloopTimer = 6;
+    if (!G._hyperloopActive) {
+      G._hyperloopActive = true;
+    }
+    spawnParticles(h.x, h.y, '#FF6D00', 20, 40);
+  } else if (h.type === 'altman') {
+    // Worldcoin Airdrop: gain coins based on tower investment
+    let totalVal = G.towers.reduce((s,t)=>s+t.totalInvested, 0);
+    const bonus = Math.floor(100 + totalVal * 0.1);
+    G.money += bonus;
+    G.moneyTexts.push({ x:GW/2, y:GH/2-40, text:'+'+bonus, life:1.5, maxLife:1.5, big:true });
+    spawnParticles(h.x, h.y, '#00C853', 15, 30);
+  }
+
+  G._screenFlash = 0.5;
+  if (G.tutorial && G.tutorialStep === 3) advanceTutorial();
+  return true;
+}
+
+// ==================== PARTICLES ====================
+function spawnParticles(x,y,color,count,spd) {
+  for (let i=0; i<count; i++) {
+    const angle = rand(0, Math.PI*2);
+    const speed = rand(spd*0.3, spd);
+    G.particles.push({
+      x, y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed - 20,
+      color, size: rand(2,5), life: rand(0.3,0.8), maxLife: rand(0.3,0.8), alive: true,
+    });
+  }
+}
+
+function spawnHitParticles(x,y,color) {
+  for (let i=0;i<4;i++) {
+    G.particles.push({
+      x,y, vx:rand(-60,60), vy:rand(-60,60),
+      color, size:rand(2,4), life:0.3, maxLife:0.3, alive:true,
+    });
+  }
+}
+
+function spawnKillParticles(x,y,color,reward) {
+  spawnParticles(x,y,color,10,30);
+  if (!G.gameOver) {
+    G.moneyTexts.push({ x, y:y-10, text:'+'+reward, life:1, maxLife:1 });
+  }
+}
+
+function updateParticles(dt) {
+  for (const p of G.particles) {
+    if (!p.alive) continue;
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    p.vy += 200 * dt; // gravity
+    p.life -= dt;
+    if (p.life <= 0) p.alive = false;
+  }
+  G.particles = G.particles.filter(p => p.alive);
+
+  // Money texts
+  for (const mt of G.moneyTexts) {
+    mt.y -= 30 * dt;
+    mt.life -= dt;
+  }
+  G.moneyTexts = G.moneyTexts.filter(mt => mt.life > 0);
+}
+
+// ==================== WAVES ====================
+function startWave() {
+  if (G.waveState !== 'idle') return;
+  const lv = LEVELS[G.levelIdx];
+  const waveData = lv.waves[G.waveIdx];
+  G.spawnQueue = [];
+  for (const group of waveData) {
+    for (let i=0; i<group.c; i++) {
+      G.spawnQueue.push({ type: group.t, delay: i * group.i });
+    }
+  }
+  G.spawnTimer = 0;
+  G.waveState = 'spawning';
+  G.waveComplete = false;
+}
+
+function updateWave(dt) {
+  if (G.waveState === 'spawning') {
+    G.spawnTimer += dt;
+    while (G.spawnQueue.length > 0 && G.spawnTimer >= G.spawnQueue[0].delay) {
+      const item = G.spawnQueue.shift();
+      const hpMult = 1 + G.levelIdx * 0.25 + G.waveIdx * 0.15;
+      spawnEnemy(item.type, hpMult);
+    }
+    if (G.spawnQueue.length === 0) G.waveState = 'active';
+  }
+
+  // Update enemies
+  for (const e of G.enemies) updateEnemy(e, dt);
+
+  // Remove dead enemies
+  G.enemies = G.enemies.filter(e => e.alive || e.hitFlash > 0);
+
+  // Hyperloop timer
+  if (G._hyperloopTimer) {
+    G._hyperloopTimer -= dt;
+    if (G._hyperloopTimer <= 0) { G._hyperloopTimer = 0; G._hyperloopActive = false; }
+  }
+
+  // Screen flash decay
+  if (G._screenFlash) {
+    G._screenFlash -= dt * 2;
+    if (G._screenFlash < 0) G._screenFlash = 0;
+  }
+
+  // Update towers
+  for (const t of G.towers) updateTower(t, dt);
+
+  // Update hero
+  updateHero(dt);
+
+  // Update projectiles
+  for (const p of G.projectiles) updateProjectile(p, dt);
+  G.projectiles = G.projectiles.filter(p => p.alive);
+
+  // Update particles
+  updateParticles(dt);
+
+  // Check wave complete
+  if (G.waveState !== 'idle' && G.enemies.filter(e=>e.alive).length === 0 && G.spawnQueue.length === 0) {
+    // Wave complete
+    const bonus = 20 + G.levelIdx * 15 + G.waveIdx * 10;
+    G.money += bonus;
+    G.moneyTexts.push({ x:GW/2, y:200, text:T('waveComplete')+bonus, life:1.5, maxLife:1.5 });
+    G.waveIdx++;
+    G.waveState = 'idle';
+    G.waveComplete = true;
+
+    if (G.waveIdx >= G.totalWaves) {
+      // Level complete!
+      levelComplete();
+    }
+  }
+}
+
+function levelComplete() {
+  G.completed = true;
+  const stars = calcStars();
+  const idx = G.levelIdx;
+  if (stars > saveData.stars[idx]) saveData.stars[idx] = stars;
+  // Unlock next level
+  if (idx + 1 < LEVELS.length) saveData.unlocked[idx+1] = true;
+  // Carry over 20% of level earnings to persistent wallet
+  const startMoney = LEVELS[idx].money;
+  const earned = G.money - startMoney;
+  if (earned > 0) saveData.money += Math.floor(earned * 0.2);
+  saveGame();
+  setState('LEVEL_COMPLETE');
+}
+
+function calcStars() {
+  const req = LEVELS[G.levelIdx].starReq;
+  if (G.lives >= req[0]) return 3;
+  if (G.lives >= req[1]) return 2;
+  if (G.lives >= req[2]) return 1;
+  return 0;
+}
+
+// ==================== PARTICLES (cont) ====================
+function addDeathEffect() {
+  // Sky particles for game over
+}
+
+// ==================== INPUT ====================
+let _tooltipTimer = null;
+let _tooltipTowerIdx = -1;
+
+function getLogicalPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  const px = (cx - rect.left) / rect.width * canvas.width;
+  const py = (cy - rect.top) / rect.height * canvas.height;
+  return { x: (px - offX) / scaleFactor, y: (py - offY) / scaleFactor };
+}
+
+function checkShopTooltip(pos) {
+  if (pos.y < GH - 55) { G._tooltipIdx = -1; _tooltipTowerIdx = -1; return; }
+  const shopY = GH - 55;
+  for (let i=0; i<TOWER_TYPES.length; i++) {
+    const bx = 10 + i * 70, bw = 60;
+    if (pos.x >= bx && pos.x <= bx+bw && pos.y >= shopY && pos.y <= GH) {
+      G._tooltipIdx = i;
+      _tooltipTowerIdx = i;
+      return;
+    }
+  }
+  G._tooltipIdx = -1;
+  _tooltipTowerIdx = -1;
+}
+
+let _touchActive = false;
+canvas.addEventListener('touchstart', e => {
+  _touchActive = true; e.preventDefault();
+  const pos = getLogicalPos(e);
+  handleTap(pos);
+  checkShopTooltip(pos);
+  clearTimeout(_tooltipTimer);
+  if (pos.y >= GH - 55) {
+    _tooltipTimer = setTimeout(() => {
+      G._tooltipIdx = _tooltipTowerIdx;
+    }, 500);
+  }
+  setTimeout(() => _touchActive = false, 300);
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  clearTimeout(_tooltipTimer);
+  G._tooltipIdx = -1;
+}, { passive: true });
+
+canvas.addEventListener('touchend', e => {
+  clearTimeout(_tooltipTimer);
+  setTimeout(() => G._tooltipIdx = -1, 2000);
+}, { passive: true });
+
+canvas.addEventListener('click', e => {
+  if (_touchActive) return;
+  handleTap(getLogicalPos(e));
+});
+
+// Mouse hover for tooltip (desktop)
+canvas.addEventListener('mousemove', e => {
+  if (_touchActive) return;
+  const pos = getLogicalPos(e);
+  // Check shop hover
+  if (state === 'PLAYING' && pos.y >= GH - 55) {
+    checkShopTooltip(pos);
+  } else if (state !== 'PLAYING' || pos.y < GH - 55) {
+    G._tooltipIdx = -1;
+  }
+});
+
+if (canvas.style) {}
+
+function handleTap(pos) {
+  switch(state) {
+    case 'MENU': menuTap(pos); break;
+    case 'LEVEL_SELECT': levelSelectTap(pos); break;
+    case 'PLAYING': handleGameTap(pos); break;
+    case 'HERO_SELECT': heroSelectTap(pos); break;
+    case 'GAME_OVER': gameOverTap(pos); break;
+    case 'LEVEL_COMPLETE': levelCompleteTap(pos); break;
+  }
+}
+
+// ==================== MENU ====================
+function menuTap(pos) {
+  const bx = GW/2-80, by = GH/2+20, bw = 160, bh = 50;
+  if (pos.x >= bx && pos.x <= bx+bw && pos.y >= by && pos.y <= by+bh) {
+    setState('LEVEL_SELECT');
+  }
+  // Language toggle
+  if (_langBtn && pos.x >= _langBtn.x && pos.x <= _langBtn.x+_langBtn.w &&
+      pos.y >= _langBtn.y && pos.y <= _langBtn.y+_langBtn.h) {
+    toggleLang();
+  }
+}
+
+// ==================== LEVEL SELECT ====================
+function levelSelectTap(pos) {
+  // Grid of levels: 3 columns x 5 rows
+  const startX = 100, startY = 100;
+  const gapX = 220, gapY = 90;
+  const size = 60;
+
+  for (let i=0; i<LEVELS.length; i++) {
+    const col = i % 3, row = Math.floor(i / 3);
+    const lx = startX + col * gapX;
+    const ly = startY + row * gapY;
+    if (pos.x >= lx && pos.x <= lx+size && pos.y >= ly && pos.y <= ly+size) {
+      if (isLevelUnlocked(i)) {
+        loadGame();
+        G._pendingLevel = i;
+        setState('HERO_SELECT');
+      }
+      return;
+    }
+  }
+
+  // Back button
+  if (pos.x >= 20 && pos.x <= 100 && pos.y >= 20 && pos.y <= 50) {
+    setState('MENU');
+  }
+}
+
+// ==================== HERO SELECT ====================
+function heroSelectTap(pos) {
+  const bw = 160, bh = 120, gap = 20;
+  const totalW = HERO_TYPES.length * bw + (HERO_TYPES.length-1) * gap;
+  const startX = GW/2 - totalW/2;
+  const startY = 140;
+
+  for (let i=0; i<HERO_TYPES.length; i++) {
+    const hd = HERO_TYPES[i];
+    const hx2 = startX + i * (bw + gap);
+    // Hero card
+    if (pos.x >= hx2 && pos.x <= hx2+bw && pos.y >= startY && pos.y <= startY+bh) {
+      if (saveData.ownedHeroes.includes(hd.id)) {
+        if (saveData.activeHero !== hd.id) {
+          saveData.activeHero = hd.id;
+          saveGame();
+        }
+      } else if (saveData.money >= hd.cost) {
+        saveData.money -= hd.cost;
+        saveData.ownedHeroes.push(hd.id);
+        saveData.activeHero = hd.id;
+        saveGame();
+      }
+      return;
+    }
+  }
+
+  // Confirm button
+  const cx = GW/2-60, cy = startY + bh + 50;
+  if (pos.x >= cx && pos.x <= cx+120 && pos.y >= cy && pos.y <= cy+40) {
+    resetGame(G._pendingLevel);
+    setState('PLAYING');
+    return;
+  }
+}
+
+// ==================== GAME TAP ====================
+function handleGameTap(pos) {
+  if (G.gameOver || G.completed) return;
+
+  // Tutorial: advance on any tap
+  if (G.tutorial && state === 'PLAYING') {
+    // Steps 2 and 4 are informational — advance on any tap
+    if (G.tutorialStep === 2 || G.tutorialStep === 4) {
+      advanceTutorial();
+      return;
+    }
+    // Steps 0, 1, 3 need actual game interaction — fall through
+  }
+
+  // Check bottom bar (shop)
+  if (pos.y >= GH - 55) {
+    const shopY = GH - 55;
+    // Tower buttons — check taps
+    for (let i=0; i<TOWER_TYPES.length; i++) {
+      const bx = 10 + i * 70, bw = 60;
+      if (pos.x >= bx && pos.x <= bx+bw && pos.y >= shopY && pos.y <= GH) {
+        startPlacing(TOWER_TYPES[i].id);
+        return;
+      }
+    }
+    // Speed toggle
+    const speedX = 380;
+    if (pos.x >= speedX && pos.x <= speedX+60 && pos.y >= shopY && pos.y <= GH) {
+      G.speed = G.speed > 1 ? 1 : 2;
+      return;
+    }
+    // Hero button (last)
+    const hx = GW - 70;
+    if (pos.x >= hx && pos.x <= hx+60 && pos.y >= shopY && pos.y <= GH) {
+      heroSpecial();
+      return;
+    }
+    return;
+  }
+
+  // Placing tower
+  if (G.placingType) {
+    tryPlace(pos);
+    return;
+  }
+
+  // Tower upgrade/sell panel click (always available)
+  if (G.selectedTower) {
+    const t = G.selectedTower;
+    const px = t.x + 30, py = t.y - 30;
+    // Upgrade button — rendered at (px, py+34, 60, 22)
+    if (pos.x >= px && pos.x <= px+60 && pos.y >= py+34 && pos.y <= py+56) {
+      if (t.level < 2) upgradeTower(t);
+      return;
+    }
+    // Sell button — rendered at (px+64, py+34, 60, 22)
+    if (pos.x >= px+64 && pos.x <= px+124 && pos.y >= py+34 && pos.y <= py+56) {
+      sellTower(t);
+      return;
+    }
+  }
+
+  // Between waves: tap existing tower to select
+  if (G.waveState === 'idle' || G.waveComplete) {
+    for (const t of G.towers) {
+      if (dist(pos.x, pos.y, t.x, t.y) < 25) {
+        G.selectedTower = G.selectedTower === t ? null : t;
+        return;
+      }
+    }
+    G.selectedTower = null;
+
+    // Start wave button
+    if (pos.x >= GW/2-60 && pos.x <= GW/2+60 && pos.y >= GH/2-20 && pos.y <= GH/2+20) {
+      startWave();
+      return;
+    }
+  }
+
+  // Hero movement: tap on path cell only
+  if (pos.x >= 0 && pos.x <= GW && pos.y >= 34 && pos.y <= GH - 55) {
+    const gx = Math.floor(pos.x / CELL);
+    const gy = Math.floor(pos.y / CELL);
+    if (G.map.pathCells.has(gx+','+gy)) {
+      G.hero.moveTarget = { x: gx * CELL + CELL/2, y: gy * CELL + CELL/2 };
+    }
+  }
+}
+
+function startPlacing(type) {
+  G.placingType = type;
+  G.placingPos = null;
+  G.placingValid = false;
+}
+
+function tryPlace(pos) {
+  const gx = Math.floor(pos.x / CELL);
+  const gy = Math.floor(pos.y / CELL);
+  if (gx < 0 || gx >= COLS || gy < 0 || gy >= ROWS) {
+    G.placingType = null; return; // cancel
+  }
+
+  // Check if valid placement
+  const key = gx+','+gy;
+  if (G.map.pathCells.has(key)) { G.placingType = null; return; }
+  for (const t of G.towers) { if (t.gridX === gx && t.gridY === gy) { G.placingType = null; return; } }
+  // Check zones
+  let inZone = false;
+  for (const z of G.map.zones) {
+    if (gx >= z.x1 && gx <= z.x2 && gy >= z.y1 && gy <= z.y2) { inZone = true; break; }
+  }
+  if (!inZone) { G.placingType = null; return; }
+
+  const placed = placeTower(G.placingType, gx, gy);
+  if (placed) {
+    G.selectedTower = null;
+    G.placingType = null;
+    // Advance tutorial if on step 0 or 1
+    if (G.tutorial && G.tutorialStep <= 1) advanceTutorial();
+  } else {
+    G.placingType = null; // can't afford or invalid
+  }
+}
+
+// ==================== TUTORIAL ====================
+function getTutorialSteps() {
+  return LANG[lang].tutorial;
+}
+
+function advanceTutorial() {
+  G.tutorialStep++;
+  if (G.tutorialStep >= getTutorialSteps().length) {
+    G.tutorial = false;
+    saveData.tutorialDone = true;
+    saveGame();
+  }
+}
+
+// ==================== GAME OVER / LEVEL COMPLETE ====================
+function gameOverTap(pos) {
+  // Retry
+  const rx = GW/2-90, ry = GH/2+40, rw = 80, rh = 40;
+  if (pos.x >= rx && pos.x <= rx+rw && pos.y >= ry && pos.y <= ry+rh) {
+    const idx = G.levelIdx;
+    // Carry over 10% of earnings on game over
+    const startMoney = LEVELS[idx].money;
+    const earned = G.money - startMoney;
+    if (earned > 0) saveData.money += Math.floor(earned * 0.1);
+    saveGame();
+    resetGame(idx);
+    setState('PLAYING');
+    return;
+  }
+  // Menu
+  const mx = GW/2+10, my = GH/2+40;
+  if (pos.x >= mx && pos.x <= mx+80 && pos.y >= my && pos.y <= my+40) {
+    // Also save some on give up
+    const startMoney = LEVELS[G.levelIdx].money;
+    const earned = G.money - startMoney;
+    if (earned > 0) saveData.money += Math.floor(earned * 0.1);
+    saveGame();
+    setState('LEVEL_SELECT');
+    return;
+  }
+}
+
+function levelCompleteTap(pos) {
+  const mx = GW/2-50, my = GH/2+60;
+  if (pos.x >= mx && pos.x <= mx+100 && pos.y >= my && pos.y <= my+40) {
+    setState('LEVEL_SELECT');
+  }
+}
+
+// ==================== DRAWING ====================
+// --- Map Doodles ---
+function drawGarageDoodles() {
+  // Window
+  dRect(550, 40, 100, 80, '#2d2d2d', '#1a1a2e');
+  for (let i=0;i<4;i++) { ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(570+Math.random()*60,50+Math.random()*50,1.5,0,Math.PI*2); ctx.fill(); }
+  // Sticky notes
+  dRect(40,60,60,50,'#2d2d2d','#f5e6a0');
+  ctx.fillStyle='#2d2d2d'; ctx.font='16px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('AI',70,90);
+}
+
+function drawFactoryDoodles() {
+  // Conveyor belt doodle
+  for (let i=0;i<6;i++) {
+    dCircle(60+i*35,540,10,'#666','#888');
+  }
+  // Robotic arm
+  dRect(680,420,20,80,'#666','#888');
+  dLine(690,420,720,380,'#666',3);
+  dCircle(720,380,8,'#666','#999');
+}
+
+function drawCloudDoodles() {
+  // Cloud shapes
+  for (let i=0;i<4;i++) {
+    const cx = 100 + i * 200, cy = 40 + Math.sin(i)*20;
+    dCircle(cx,cy,25,'#fff','rgba(255,255,255,0.8)');
+    dCircle(cx-20,cy+10,18,'#fff','rgba(255,255,255,0.8)');
+    dCircle(cx+20,cy+10,18,'#fff','rgba(255,255,255,0.8)');
+  }
+}
+
+// ==================== RENDER ====================
+function render() {
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  // Draw background (letterbox)
+  ctx.fillStyle = '#1a1a2e';
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.save();
+  ctx.translate(offX, offY);
+  ctx.scale(scaleFactor, scaleFactor);
+
+  // Clip to game area
+  ctx.beginPath();
+  ctx.rect(0, 0, GW, GH);
+  ctx.clip();
+
+  switch(state) {
+    case 'MENU': renderMenu(); break;
+    case 'LEVEL_SELECT': renderLevelSelect(); break;
+    case 'HERO_SELECT': renderHeroSelect(); break;
+    case 'PLAYING': renderGame(); break;
+    case 'GAME_OVER': renderGame(); renderGameOver(); break;
+    case 'LEVEL_COMPLETE': renderLevelComplete(); break;
+    default: renderMenu();
+  }
+
+  ctx.restore();
+}
+
+function renderMenu() {
+  ctx.fillStyle = '#f5f0e8';
+  ctx.fillRect(0, 0, GW, GH);
+
+  // Title
+  ctx.fillStyle = '#2d2d2d';
+  ctx.font = 'bold 48px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(T('title'), GW/2, 200);
+
+  // Subtitle
+  ctx.font = '18px sans-serif';
+  ctx.fillStyle = '#888';
+  ctx.fillText(T('subtitle'), GW/2, 240);
+
+  // Play button
+  dRoundRect(GW/2-80, GH/2+20, 160, 50, 10, '#4A90D9', null);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 22px sans-serif';
+  ctx.fillText(T('start'), GW/2, GH/2+52);
+
+  // Language toggle
+  const lx = GW/2 - 100, ly = GH/2 + 90, lw = 200, lh = 36;
+  dRoundRect(lx, ly, lw, lh, 8, '#333', '#555');
+  ctx.fillStyle = '#fff';
+  ctx.font = '14px sans-serif';
+  ctx.fillText(lang === 'zh' ? T('langEn') : T('langZh'), GW/2, ly + 24);
+  _langBtn = { x:lx, y:ly, w:lw, h:lh };
+
+  // Footer
+  ctx.fillStyle = '#aaa';
+  ctx.font = '13px sans-serif';
+  ctx.fillText(T('footer'), GW/2, GH-30);
+  ctx.fillText(T('heroes'), GW/2, GH-10);
+
+  // Decorative elements
+  dCircle(150, 120, 30, '#4A90D9', 'rgba(74,144,217,0.1)');
+  dCircle(650, 100, 25, '#FF6D00', 'rgba(255,109,0,0.1)');
+  dCircle(700, 400, 20, '#E040FB', 'rgba(224,64,251,0.1)');
+}
+
+function renderLevelSelect() {
+  ctx.fillStyle = '#f5f0e8';
+  ctx.fillRect(0, 0, GW, GH);
+
+  ctx.fillStyle = '#2d2d2d';
+  ctx.font = 'bold 24px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(T('selectLevel'), 20, 40);
+
+  // Stars display
+  ctx.textAlign = 'right';
+  ctx.font = '16px sans-serif';
+  ctx.fillStyle = '#e8b830';
+  ctx.fillText(T('stars')+' '+saveData.totalStars, GW-20, 40);
+
+  // Back
+  ctx.textAlign = 'center';
+  dRoundRect(20, 50, 60, 28, 6, '#ddd', '#ccc');
+  ctx.fillStyle = '#555'; ctx.font = '14px sans-serif';
+  ctx.fillText(T('back'), 50, 70);
+
+  const startX = 100, startY = 100, gapX = 220, gapY = 90, size = 60;
+
+  for (let i=0; i<LEVELS.length; i++) {
+    const col = i % 3, row = Math.floor(i / 3);
+    const lx = startX + col * gapX;
+    const ly = startY + row * gapY;
+    const unlocked = isLevelUnlocked(i);
+    const stars = saveData.stars[i];
+    const lv = LEVELS[i];
+    const mapName = lv.map==='garage'?T('mapG'):lv.map==='factory'?T('mapF'):T('mapC');
+
+    // Level box
+    dRoundRect(lx, ly, size, size, 8, unlocked ? '#fff' : '#ddd', unlocked ? '#4A90D9' : '#ccc');
+    ctx.fillStyle = unlocked ? '#2d2d2d' : '#aaa';
+    ctx.font = 'bold 22px sans-serif';
+    ctx.fillText(''+(i+1), lx+size/2, ly+size/2+8);
+    ctx.font = '10px sans-serif';
+    ctx.fillText(mapName, lx+size/2, ly+size-8);
+
+    // Stars for completed levels
+    if (stars > 0) {
+      ctx.fillStyle = '#e8b830';
+      ctx.font = '12px sans-serif';
+      ctx.fillText('⭐'.repeat(stars), lx+size/2, ly-8);
+    }
+
+    if (!unlocked) {
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.fillRect(lx, ly, size, size);
+      ctx.fillStyle = '#fff';
+      ctx.font = '22px sans-serif';
+      ctx.fillText('🔒', lx+size/2, ly+size/2+8);
+    }
+  }
+
+  // Map key
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#888';
+  ctx.font = '13px sans-serif';
+  ctx.fillText(T('mapGF'), 100, 550);
+  ctx.fillText(T('mapFF'), 320, 550);
+  ctx.fillText(T('mapCF'), 540, 550);
+}
+
+function renderGame() {
+  if (!G.map) return;
+  const m = G.map;
+  G.gameTime += 0.016;
+
+  // Background
+  ctx.fillStyle = m.bg;
+  ctx.fillRect(0, 0, GW, GH);
+
+  // Map doodles
+  if (m.doodle) m.doodle();
+
+  // Path
+  ctx.strokeStyle = m.pathC;
+  ctx.lineWidth = 28;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(m.path[0].x, m.path[0].y);
+  for (let i=1; i<m.path.length; i++) ctx.lineTo(m.path[i].x, m.path[i].y);
+  ctx.stroke();
+
+  // Path edges
+  ctx.strokeStyle = '#2d2d2d';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5,5]);
+  ctx.beginPath();
+  ctx.moveTo(m.path[0].x, m.path[0].y);
+  for (let i=1; i<m.path.length; i++) ctx.lineTo(m.path[i].x, m.path[i].y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Placement ghost
+  if (G.placingType) {
+    for (let gy=0; gy<ROWS; gy++) for (let gx=0; gx<COLS; gx++) {
+      const key = gx+','+gy;
+      let isPath = m.pathCells.has(key);
+      let isOccupied = G.towers.some(t=>t.gridX===gx&&t.gridY===gy);
+      let inZone = m.zones.some(z=>gx>=z.x1&&gx<=z.x2&&gy>=z.y1&&gy<=z.y2);
+      if (isPath || isOccupied || !inZone) continue;
+      ctx.fillStyle = 'rgba(74,144,217,0.15)';
+      ctx.fillRect(gx*CELL, gy*CELL, CELL, CELL);
+      dRect(gx*CELL, gy*CELL, CELL, CELL, 'rgba(74,144,217,0.3)');
+    }
+  }
+
+  // Towers
+  for (const t of G.towers) {
+    const tDef = TOWER_TYPES.find(d=>d.id===t.type);
+    const cx = t.x, cy = t.y;
+    const pulsing = 0.8 + 0.2 * Math.sin(G.gameTime * 3 + t.x);
+
+    // Tower base
+    dCircle(cx, cy, 16, '#2d2d2d', t.color + '33');
+
+    if (t.type === 'gpu') {
+      dRect(cx-12, cy-12, 24, 24, '#2d2d2d', '#fff');
+      ctx.fillStyle = t.color; ctx.fillRect(cx-8, cy-8, 16, 16);
+      // Fan
+      const fanAngle = G.gameTime * 8;
+      ctx.strokeStyle = '#2d2d2d'; ctx.lineWidth = 1.5;
+      for (let i=0;i<3;i++) {
+        const a = fanAngle + i * Math.PI*2/3;
+        dLine(cx, cy, cx+8*Math.cos(a), cy+8*Math.sin(a), '#2d2d2d', 1.5);
+      }
+      dCircle(cx, cy, 4, '#2d2d2d', t.color);
+    } else if (t.type === 'firewall') {
+      dRect(cx-14, cy-10, 28, 20, '#2d2d2d', t.color + '44');
+      ctx.fillStyle = '#2d2d2d'; ctx.font='18px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('🛡️', cx, cy+6);
+    } else if (t.type === 'miner') {
+      dRect(cx-10, cy-14, 20, 28, '#2d2d2d', t.color + '44');
+      ctx.fillStyle = '#2d2d2d'; ctx.font='18px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('⛏️', cx, cy+6);
+    } else if (t.type === 'neural') {
+      dCircle(cx, cy, 16, '#2d2d2d', t.color + '33');
+      for (let i=0; i<6; i++) {
+        const a = i * Math.PI/3 + G.gameTime;
+        dCircle(cx+12*Math.cos(a), cy+12*Math.sin(a), 4, t.color, t.color + '44');
+        dLine(cx, cy, cx+12*Math.cos(a), cy+12*Math.sin(a), t.color, 1);
+      }
+    } else if (t.type === 'transformer') {
+      dCircle(cx, cy, 14, '#2d2d2d', t.color + '33');
+      dLine(cx-12, cy-6, cx+12, cy-6, '#2d2d2d', 2);
+      dLine(cx-8, cy+6, cx+8, cy+6, '#2d2d2d', 2);
+      ctx.fillStyle = '#2d2d2d'; ctx.font='14px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('📡', cx, cy+5);
+    }
+
+    // Level indicator
+    if (t.level > 0) {
+      ctx.fillStyle = '#FFD600';
+      for (let i=0; i<=t.level; i++) {
+        dCircle(cx-6+i*6, cy-18, 3, '#FFD600', '#FFD600');
+      }
+    }
+
+    // Range indicator if selected
+    if (G.selectedTower === t) {
+      ctx.beginPath(); ctx.arc(cx, cy, t.range, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(74,144,217,0.3)'; ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  }
+
+  // Enemies
+  for (const e of G.enemies) {
+    if (!e.alive) continue;
+    const flash = e.hitFlash > 0 ? '#fff' : e.color;
+    dCircle(e.x, e.y, e.size, '#2d2d2d', flash + '88');
+
+    // Specific enemy doodles
+    if (e.type === 'agi') {
+      dCircle(e.x, e.y, e.size+4, '#D50000', 'rgba(213,0,0,0.3)');
+      ctx.fillStyle = '#D50000'; ctx.font='14px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('👑', e.x, e.y-16);
+    } else if (e.type === 'regulation') {
+      dRect(e.x-10, e.y-8, 20, 16, '#2d2d2d', flash + '88');
+    } else if (e.type === 'virus') {
+      dCircle(e.x-5, e.y-5, 4, '#8E24AA', '#8E24AA88');
+      dCircle(e.x+5, e.y+5, 4, '#8E24AA', '#8E24AA88');
+    }
+
+    // HP bar (always visible for bosses)
+    if (e.hp < e.maxHp || e.type === 'agi') {
+      const bw = e.size * 2.5, bh = 4;
+      const hpPct = e.hp / e.maxHp;
+      ctx.fillStyle = '#333';
+      ctx.fillRect(e.x - bw/2, e.y - e.size - 8, bw, bh);
+      ctx.fillStyle = hpPct > 0.5 ? '#4CAF50' : (hpPct > 0.25 ? '#FFD600' : '#E53935');
+      ctx.fillRect(e.x - bw/2, e.y - e.size - 8, bw * hpPct, bh);
+      dRect(e.x - bw/2, e.y - e.size - 8, bw, bh, '#2d2d2d');
+    }
+  }
+
+  // Hero
+  const h = G.hero;
+  if (h) {
+    const hDef = getHeroDef(h.type);
+    const hi = HERO_TYPES.indexOf(hDef);
+    const hColor = hDef.color;
+    const bobY = Math.sin(G.gameTime * 2) * 2;
+    const heroName = Array.isArray(T('heroName')) ? T('heroName')[hi] : T('heroName');
+
+    // Jensen aura range indicator
+    if (h.type === 'jensen') {
+      ctx.beginPath(); ctx.arc(h.x, h.y, 120, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(74,144,217,0.15)'; ctx.lineWidth = 1;
+      ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
+    }
+
+    // Move target indicator
+    if (h.moveTarget) {
+      dLine(h.x, h.y, h.moveTarget.x, h.moveTarget.y, 'rgba(255,255,255,0.3)', 1);
+      dCircle(h.moveTarget.x, h.moveTarget.y, 4, 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0.2)');
+    }
+
+    // Hero body based on type
+    if (h.type === 'jensen') {
+      // Leather jacket
+      dRect(h.x-8, h.y-5+bobY, 16, 20, '#2d2d2d', '#2d2d2d');
+      dCircle(h.x, h.y-14+bobY, 10, '#2d2d2d', '#f5d0a9');
+      dLine(h.x-8, h.y+2+bobY, h.x+8, h.y+2+bobY, '#555', 2);
+      ctx.fillRect(h.x-4, h.y-16+bobY, 3, 3);
+      ctx.fillRect(h.x+2, h.y-16+bobY, 3, 3);
+      ctx.beginPath(); ctx.arc(h.x, h.y-20+bobY, 12, Math.PI, 2*Math.PI); ctx.fill();
+    } else if (h.type === 'musk') {
+      // Spacesuit
+      dRect(h.x-9, h.y-6+bobY, 18, 22, '#2d2d2d', '#333');
+      dCircle(h.x, h.y-14+bobY, 9, '#2d2d2d', '#f5d0a9');
+      ctx.fillRect(h.x-3, h.y-17+bobY, 2, 2); ctx.fillRect(h.x+2, h.y-17+bobY, 2, 2);
+      // Rocket hair
+      ctx.fillStyle = '#2d2d2d';
+      ctx.beginPath(); ctx.arc(h.x, h.y-20+bobY, 11, Math.PI, 2*Math.PI); ctx.fill();
+    } else if (h.type === 'altman') {
+      // Suit
+      dRect(h.x-7, h.y-5+bobY, 14, 20, '#2d2d2d', '#1a1a1a');
+      dCircle(h.x, h.y-14+bobY, 9, '#2d2d2d', '#f5d0a9');
+      ctx.fillRect(h.x-3, h.y-16+bobY, 2, 2); ctx.fillRect(h.x+2, h.y-16+bobY, 2, 2);
+      // Short hair
+      ctx.fillStyle = '#2d2d2d';
+      ctx.beginPath(); ctx.arc(h.x, h.y-20+bobY, 10, Math.PI, 2*Math.PI); ctx.fill();
+    }
+    ctx.fillStyle = '#2d2d2d';
+    ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(heroName, h.x, h.y+28+bobY);
+
+    // Skill cooldown ring
+    if (!h.specialReady) {
+      const def = getHeroDef(h.type);
+      const prog = 1 - (h.activeCD / def.activeCD);
+      ctx.beginPath();
+      ctx.arc(h.x, h.y-14+bobY, 14, -Math.PI/2, -Math.PI/2 + Math.PI*2*prog);
+      ctx.strokeStyle = hColor; ctx.lineWidth = 3; ctx.stroke();
+    }
+  }
+
+  // Projectiles
+  for (const p of G.projectiles) {
+    if (!p.alive) continue;
+    if (p.effect === 'laser' || p.effect === 'hero') {
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y); ctx.lineTo(p.tx, p.ty);
+      if (p.effect === 'hero') {
+        ctx.strokeStyle = p.color + '44'; ctx.lineWidth = 6; ctx.stroke();
+        ctx.strokeStyle = p.color; ctx.lineWidth = 3; ctx.stroke();
+      } else {
+        ctx.strokeStyle = p.color; ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    } else {
+      dCircle(p.x, p.y, 4, p.color, p.color);
+    }
+  }
+
+  // Particles
+  for (const p of G.particles) {
+    if (!p.alive) continue;
+    const alpha = clamp(p.life / p.maxLife, 0, 1);
+    ctx.globalAlpha = alpha;
+    dCircle(p.x, p.y, p.size, p.color, p.color);
+    ctx.globalAlpha = 1;
+  }
+
+  // Money texts / damage numbers
+  for (const mt of G.moneyTexts) {
+    const alpha = clamp(mt.life / mt.maxLife, 0, 1);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = mt.color || '#4CAF50';
+    ctx.font = mt.big ? 'bold 22px sans-serif' : 'bold 16px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(mt.text, mt.x, mt.y);
+    ctx.globalAlpha = 1;
+  }
+
+  // ========== HUD ==========
+  // Top bar bg
+  ctx.fillStyle = 'rgba(45,45,45,0.85)';
+  ctx.fillRect(0, 0, GW, 34);
+
+  // Lives
+  ctx.fillStyle = '#E53935'; ctx.font = '16px sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText(T('lives') + ' ' + G.lives, 12, 24);
+
+  // Money
+  ctx.fillStyle = '#FFD600'; ctx.font = 'bold 16px sans-serif';
+  ctx.fillText(T('money') + ' ' + fmt(G.money), 100, 24);
+
+  // Wave
+  ctx.fillStyle = '#fff'; ctx.font = '14px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(T('wave') + ' ' + (G.waveIdx+1) + '/' + G.totalWaves, GW/2, 24);
+
+  // Kills
+  ctx.fillStyle = '#888'; ctx.font = '13px sans-serif'; ctx.textAlign = 'right';
+  ctx.fillText(T('kills') + ' ' + G.totalKills, GW-12, 24);
+
+  // ========== BOTTOM BAR (Shop) ==========
+  const shopY = GH - 55;
+  ctx.fillStyle = 'rgba(45,45,45,0.9)';
+  ctx.fillRect(0, shopY, GW, 55);
+
+  // Tower buttons
+  for (let i=0; i<TOWER_TYPES.length; i++) {
+    const tDef = TOWER_TYPES[i];
+    const bx = 10 + i * 70;
+    const canAfford = G.money >= tDef.cost[0];
+    dRoundRect(bx, shopY+5, 60, 45, 6, canAfford ? '#333' : '#222', '#555');
+    ctx.fillStyle = canAfford ? '#fff' : '#666';
+    ctx.font = '18px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(tDef.icon, bx+30, shopY+27);
+    ctx.font = '9px sans-serif';
+    ctx.fillText(fmt(tDef.cost[0]), bx+30, shopY+47);
+  }
+
+  // Speed toggle button
+  const speedX = 380;
+  const is2x = G.speed > 1;
+  dRoundRect(speedX, shopY+5, 60, 45, 6, is2x ? '#FF6D00' : '#333', '#555');
+  ctx.fillStyle = is2x ? '#fff' : '#888';
+  ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(is2x ? '2x' : '1x', speedX+30, shopY+32);
+
+  // Hero ability button
+  const hx = GW - 70;
+  const heroReady = G.hero && G.hero.specialReady;
+  const hDef = G.hero && getHeroDef(G.hero.type);
+  const hi = hDef ? HERO_TYPES.indexOf(hDef) : 0;
+  const hColor = hDef ? hDef.color : '#4A90D9';
+  const skillName = Array.isArray(T('heroActive')) ? T('heroActive')[hi] : T('ability');
+  dRoundRect(hx, shopY+5, 60, 45, 6, heroReady ? hColor : '#333', '#555');
+  ctx.fillStyle = heroReady ? '#fff' : '#666';
+  ctx.font = '18px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('⚡', hx+30, shopY+22);
+  ctx.font = '8px sans-serif';
+  ctx.fillText(skillName, hx+30, shopY+42);
+  if (heroReady) {
+    const pulse = 0.5 + 0.3 * Math.sin(G.gameTime * 4);
+    ctx.shadowColor = hColor;
+    ctx.shadowBlur = 10 * pulse;
+    ctx.strokeStyle = hColor; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect(hx, shopY+5, 60, 45, 6); ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  // ========== TOWER TOOLTIP ==========
+  if (G._tooltipIdx >= 0 && state === 'PLAYING') {
+    const ti = G._tooltipIdx;
+    if (ti < TOWER_TYPES.length) {
+      const td = TOWER_TYPES[ti];
+      const tx = Math.min(10 + ti * 70, GW - 200), ty = shopY - 115;
+      const tw = 185, th = 108;
+      dRoundRect(tx, ty, tw, th, 8, '#fff', '#2d2d2d');
+      ctx.fillStyle = '#2d2d2d';
+      ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText(T('tNames')[ti] || td.name, tx+8, ty+18);
+      ctx.font = '10px sans-serif'; ctx.fillStyle = '#666';
+      ctx.fillText(T('tDescs')[ti] || td.desc, tx+8, ty+34);
+      ctx.fillStyle = '#888'; ctx.font = '9px sans-serif';
+      ctx.fillText(T('dmg')+' '+td.dmg[0]+'/'+td.dmg[1]+'/'+td.dmg[2]+'  '+T('rng')+' '+td.range[0], tx+8, ty+50);
+      ctx.fillText(T('rate')+' '+td.rate[0].toFixed(1)+'s  '+T('effect')+' '+(td.effect||'—'), tx+8, ty+64);
+      ctx.fillStyle = '#FFD600'; ctx.font = '10px sans-serif';
+      ctx.fillText(T('cost')+' '+td.cost[0]+'/'+td.cost[1]+'/'+td.cost[2], tx+8, ty+80);
+      ctx.fillStyle = '#999'; ctx.font = '8px sans-serif';
+      ctx.fillText('⬆ '+T('level')+'.1/2/3', tx+8, ty+96);
+    }
+  }
+
+  // ========== HYPERLOOP ACTIVE INDICATOR ==========
+  if (G._hyperloopTimer && G._hyperloopTimer > 0) {
+    ctx.fillStyle = '#FF6D00';
+    ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('⚡ HYPERLOOP '+G._hyperloopTimer.toFixed(1)+'s', GW/2, GH/2-55);
+  }
+
+  // ========== BETWEEN WAVES: Start button ==========
+  if ((G.waveState === 'idle' && G.waveIdx < G.totalWaves && !G.completed) || G.waveComplete) {
+    dRoundRect(GW/2-60, GH/2-20, 120, 40, 8, '#4A90D9', null);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 18px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(G.waveIdx === 0 ? T('startWave') : T('nextWave'), GW/2, GH/2+7);
+
+    // Wave info
+    ctx.fillStyle = '#888';
+    ctx.font = '14px sans-serif';
+    ctx.fillText(T('getReady'), GW/2, GH/2-28);
+  }
+
+  // ========== TOWER SELECTED PANEL ==========
+  if (G.selectedTower) {
+    const t = G.selectedTower;
+    const tDef = TOWER_TYPES.find(d=>d.id===t.type);
+    const px = Math.min(t.x + 30, GW - 140);
+    const py = t.y - 30;
+
+    dRoundRect(px, py, 130, 60, 6, 'rgba(255,255,255,0.95)', '#2d2d2d');
+    ctx.fillStyle = '#2d2d2d';
+    ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'left';
+    const ti = TOWER_TYPES.indexOf(tDef);
+    ctx.fillText((T('tNames')[ti]||tDef.name) + ' ' + T('level') + '.' + (t.level+1), px+6, py+16);
+    ctx.font = '10px sans-serif'; ctx.fillStyle = '#666';
+    ctx.fillText(T('dmg')+t.dmg+' '+T('rng')+t.range, px+6, py+30);
+
+    // Upgrade button
+    const upgCost = getUpgradeCost(t);
+    if (t.level < 2 && G.money >= upgCost) {
+      dRoundRect(px, py+34, 60, 22, 4, '#4A90D9', null);
+      ctx.fillStyle = '#fff'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('⬆ ' + fmt(upgCost), px+30, py+50);
+    } else if (t.level >= 2) {
+      ctx.fillStyle = '#999'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(T('maxLv'), px+30, py+50);
+    }
+
+    // Sell button
+    dRoundRect(px+64, py+34, 60, 22, 4, '#E53935', null);
+    ctx.fillStyle = '#fff'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('💰 '+fmt(Math.floor(t.totalInvested*0.5)), px+94, py+50);
+  }
+
+  // ========== SCREEN FLASH ==========
+  if (G._screenFlash > 0) {
+    ctx.fillStyle = 'rgba(255,255,255,' + (G._screenFlash * 0.4) + ')';
+    ctx.fillRect(0, 0, GW, GH);
+  }
+
+  // ========== TUTORIAL ==========
+  if (G.tutorial && G.tutorialStep < getTutorialSteps().length) {
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    ctx.fillRect(0, 0, GW, GH);
+
+    // Highlight area for steps 0-1 (placement zones)
+    if (G.tutorialStep <= 1) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = 'rgba(0,0,0,1)';
+      // Highlight a valid zone
+      const zp = G.map.zones[0];
+      ctx.fillRect(zp.x1*CELL, zp.y1*CELL, (zp.x2-zp.x1+1)*CELL, (zp.y2-zp.y1+1)*CELL);
+      ctx.restore();
+
+      // Pulsing border
+      ctx.save();
+      ctx.globalCompositeOperation = 'source-over';
+      const pulse = 0.5 + 0.3 * Math.sin(G.gameTime * 4);
+      ctx.strokeStyle = `rgba(74,144,217,${pulse})`;
+      ctx.lineWidth = 3; ctx.setLineDash([6,4]);
+      ctx.strokeRect(zp.x1*CELL, zp.y1*CELL, (zp.x2-zp.x1+1)*CELL, (zp.y2-zp.y1+1)*CELL);
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+
+    // Highlight hero button for step 3
+    if (G.tutorialStep === 3) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = 'rgba(0,0,0,1)';
+      dRoundRect(hx, shopY+5, 60, 45, 6, '#000', null);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(hx, shopY+5, 60, 45);
+      ctx.restore();
+
+      const pulse2 = 0.5 + 0.3 * Math.sin(G.gameTime * 4);
+      ctx.save();
+      ctx.strokeStyle = `rgba(255,214,0,${pulse2})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.roundRect(hx, shopY+5, 60, 45, 6); ctx.stroke();
+      ctx.restore();
+    }
+
+    // Speech bubble
+    const bubbleW = 320, bubbleH = 80;
+    const bx2 = GW/2 - bubbleW/2, by2 = 80;
+    dRoundRect(bx2, by2, bubbleW, bubbleH, 10, '#fff', '#2d2d2d');
+
+    const stepText = getTutorialSteps()[G.tutorialStep];
+    ctx.fillStyle = '#2d2d2d';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    const lines = stepText.split('\n');
+    const lh = 20;
+    for (let i=0; i<lines.length; i++) {
+      ctx.fillText(lines[i], GW/2, by2 + 20 + i * lh);
+    }
+
+    // Continue hint
+    ctx.fillStyle = '#aaa';
+    ctx.font = '12px sans-serif';
+    ctx.fillText(T('tapToCont'), GW/2, by2 + bubbleH - 8);
+  }
+
+  // ========== END OF GAME RENDER ==========
+}
+
+function renderGameOver() {
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
+  ctx.fillRect(0, 0, GW, GH);
+
+  ctx.fillStyle = '#E53935';
+  ctx.font = 'bold 36px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(T('gameOver'), GW/2, GH/2-60);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '18px sans-serif';
+  ctx.fillText(T('aiLost') + ' ' + G.totalKills + ' ' + T('enemies'), GW/2, GH/2-15);
+
+  // Retry
+  dRoundRect(GW/2-90, GH/2+40, 80, 40, 8, '#4A90D9', null);
+  ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif';
+  ctx.fillText(T('retry'), GW/2-50, GH/2+66);
+
+  // Menu
+  dRoundRect(GW/2+10, GH/2+40, 80, 40, 8, '#666', null);
+  ctx.fillStyle = '#fff';
+  ctx.fillText(T('menu'), GW/2+50, GH/2+66);
+
+  // Ad revive button
+  dRoundRect(GW/2-80, GH/2+95, 160, 36, 8, '#FFD600', null);
+  ctx.fillStyle = '#2d2d2d'; ctx.font = '14px sans-serif';
+  ctx.fillText(T('adRevive'), GW/2, GH/2+119);
+}
+
+function renderLevelComplete() {
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
+  ctx.fillRect(0, 0, GW, GH);
+
+  const stars = calcStars();
+
+  ctx.fillStyle = '#4CAF50';
+  ctx.font = 'bold 36px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(T('levelComplete'), GW/2, GH/2-80);
+
+  // Stars
+  ctx.font = '40px sans-serif';
+  const starY = GH/2-30;
+  for (let i=0; i<3; i++) {
+    ctx.fillStyle = i < stars ? '#FFD600' : '#555';
+    ctx.fillText('⭐', GW/2 - 50 + i*50, starY);
+  }
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '16px sans-serif';
+  ctx.fillText(T('livesLeft') + ' ' + G.lives + '  ' + T('kills2') + ' ' + G.totalKills, GW/2, GH/2+20);
+  ctx.fillText(T('gold') + ' ' + fmt(G.money), GW/2, GH/2+44);
+  ctx.fillStyle = '#aaa';
+  ctx.font = '13px sans-serif';
+  ctx.fillText(T('totalStars') + ' ' + (saveData.totalStars + stars), GW/2, GH/2+68);
+
+  // Continue
+  dRoundRect(GW/2-50, GH/2+80, 100, 40, 8, '#4A90D9', null);
+  ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif';
+  ctx.fillText(T('cont'), GW/2, GH/2+107);
+}
+
+// ==================== HERO SELECT RENDER ====================
+function renderHeroSelect() {
+  ctx.fillStyle = '#f5f0e8';
+  ctx.fillRect(0, 0, GW, GH);
+
+  ctx.fillStyle = '#2d2d2d';
+  ctx.font = 'bold 22px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(T('selectHero'), GW/2, 60);
+
+  // Coins display
+  ctx.font = '16px sans-serif';
+  ctx.fillStyle = '#FFD600';
+  ctx.fillText(T('money')+' '+fmt(saveData.money), GW/2, 90);
+
+  const bw = 160, bh = 120, gap = 20;
+  const totalW = HERO_TYPES.length * bw + (HERO_TYPES.length-1) * gap;
+  const startX = GW/2 - totalW/2;
+  const startY = 140;
+
+  for (let i=0; i<HERO_TYPES.length; i++) {
+    const hd = HERO_TYPES[i];
+    const hx2 = startX + i * (bw + gap);
+    const owned = saveData.ownedHeroes.includes(hd.id);
+    const equipped = saveData.activeHero === hd.id;
+    const canBuy = !owned && saveData.money >= hd.cost;
+
+    // Card background
+    const cardColor = equipped ? '#e3f2fd' : (owned ? '#f0f8f0' : '#eee');
+    dRoundRect(hx2, startY, bw, bh, 10, equipped ? '#4A90D9' : '#ccc', cardColor);
+
+    // Hero emoji
+    const emojis = ['👨‍💻', '🚀', '👔'];
+    ctx.font = '30px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(emojis[i], hx2+bw/2, startY+35);
+
+    // Name
+    const hName = Array.isArray(T('heroName')) ? T('heroName')[i] : '';
+    ctx.fillStyle = '#2d2d2d'; ctx.font = 'bold 12px sans-serif';
+    ctx.fillText(hName, hx2+bw/2, startY+55);
+
+    // Skills
+    const aName = Array.isArray(T('heroActive')) ? T('heroActive')[i] : '';
+    const pDesc = Array.isArray(T('heroPassive')) ? T('heroPassive')[i] : '';
+    ctx.fillStyle = '#4A90D9'; ctx.font = '9px sans-serif';
+    ctx.fillText('⚡ '+aName, hx2+bw/2, startY+72);
+    ctx.fillStyle = '#888'; ctx.font = '8px sans-serif';
+    ctx.fillText(pDesc, hx2+bw/2, startY+86);
+
+    // Status
+    if (owned) {
+      ctx.fillStyle = equipped ? '#4A90D9' : '#666';
+      ctx.font = '10px sans-serif';
+      ctx.fillText(equipped ? T('heroSelected') : (hd.cost > 0 ? T('heroOwned') : ''), hx2+bw/2, startY+108);
+    } else {
+      ctx.fillStyle = canBuy ? '#4CAF50' : '#E53935';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText((hd.cost > 0 ? fmt(hd.cost) : T('heroOwned')), hx2+bw/2, startY+108);
+    }
+  }
+
+  // Confirm button
+  dRoundRect(GW/2-60, startY + bh + 50, 120, 40, 8, '#4A90D9', null);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(T('cont'), GW/2, startY + bh + 75);
+}
+
+// ==================== GAME LOOP ====================
+let _lastTime = 0;
+function gameLoop(timestamp) {
+  const rawDt = Math.min(33, (timestamp - _lastTime) / 1000);
+  _lastTime = timestamp;
+
+  const dt = rawDt * (G.speed || 1);
+
+  if (state === 'PLAYING' && !G.gameOver && !G.completed) {
+    updateWave(dt);
+
+    // Check game over
+    if (G.lives <= 0) {
+      G.gameOver = true;
+      setState('GAME_OVER');
+    }
+  }
+
+  render();
+  requestAnimationFrame(gameLoop);
+}
+
+// ==================== STATE ENTER ====================
+_stateEnter['MENU'] = function() {
+  loadGame();
+};
+_stateEnter['LEVEL_SELECT'] = function() {
+  loadGame();
+};
+_stateEnter['HERO_SELECT'] = function() {
+  loadGame();
+};
+
+// ==================== AD INTEGRATION ====================
+let isNative = typeof window.Capacitor !== 'undefined' && window.Capacitor.isNativePlatform();
+
+async function initAdMob() {
+  if (isNative) {
+    try {
+      const { AdMob } = window.Capacitor.Plugins;
+      await AdMob.initialize();
+      await AdMob.showBanner({ adSize: 'BANNER', position: 'bottom' });
+      document.getElementById('bannerAd').classList.remove('hidden');
+      document.getElementById('bannerAd').classList.add('active');
+      document.getElementById('app').classList.add('has-banner');
+    } catch(e) {
+      console.log('AdMob not available');
+    }
+  }
+}
+
+// Ad revive in game over
+function adRevive() {
+  if (isNative) {
+    try {
+      const { AdMob } = window.Capacitor.Plugins;
+      AdMob.prepareRewardVideoAd().then(() =>
+        AdMob.showRewardVideoAd().then(result => {
+          if (result && result.isRewarded) {
+            G.lives = 10; G.gameOver = false;
+            setState('PLAYING');
+          }
+        })
+      ).catch(() => {});
+    } catch(e) {}
+  } else {
+    G.lives = 10; G.gameOver = false;
+    setState('PLAYING');
+  }
+}
+
+// Add revive button handler dynamically
+document.addEventListener('click', function(e) {
+  if (state !== 'GAME_OVER') return;
+  const rect = canvas.getBoundingClientRect();
+  const px = (e.clientX - rect.left) / rect.width * canvas.width;
+  const py = (e.clientY - rect.top) / rect.height * canvas.height;
+  const lx = (px - offX) / scaleFactor, ly = (py - offY) / scaleFactor;
+  // Ad revive button
+  if (lx >= GW/2-80 && lx <= GW/2+80 && ly >= GH/2+95 && ly <= GH/2+131) {
+    adRevive();
+  }
+});
+
+// ==================== INIT ====================
+function init() {
+  resizeCanvas();
+  loadGame();
+  initAdMob();
+  setState('MENU');
+  _lastTime = performance.now();
+  requestAnimationFrame(gameLoop);
+}
+
+// Handle visibility change for save
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden) saveGame();
+});
+
+// Manual save timer
+setInterval(() => { if (state === 'PLAYING') saveGame(); }, 30000);
+
+// Register service worker for offline PWA
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+
+init();
+</script>
+</body>
+</html>
