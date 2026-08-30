@@ -1,7 +1,7 @@
 {
   "name": "ai-empire",
   "version": "1.0.0",
-  "description": "AI Empire - Idle Clicker Game",
+  "description": "AI Empire - Tower Defense Game",
   "private": true,
   "scripts": {
     "build": "echo 'Static HTML - no build needed'",

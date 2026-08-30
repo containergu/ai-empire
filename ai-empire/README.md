@@ -1,74 +1,75 @@
-# AI Empire (AI 帝国)
+# AI Empire (AI 帝国塔防)
 
-Idle clicker game — build an AI startup from a garage to the cloud.
+A bilingual (中文/English) **tower-defense** game with a tech-startup theme: place towers, fend off waves of bugs, viruses, bad models, regulators, and the AGI boss, and climb from a Silicon Valley garage to the cloud.
 
-## Quick Start (Browser)
+## Play Online
 
-Open `www/index.html` in any browser. That's it.
+**https://containergu.github.io/ai-empire/**
 
-## Build as Mobile App
+Open in mobile browser → **Add to Home Screen** to install as an offline PWA.
+
+## The Game
+
+- **Tower defense**: 15 levels across 3 maps (Silicon Garage → Shenzhen Factory → Cloud Battle)
+- **5 tower types** (GPU Tower, Firewall, Data Miner, Neural Net, Transformer), each upgradeable to Lv.3
+- **3 heroes** (Jacket King, Rocket Bro, The Oracle) with active + passive abilities
+- **Star ratings** (1–3 stars per level), level unlocking, and a persistent wallet (20% of earnings carries over between levels)
+- **Rewarded ads**: revive on death, double the level reward, and a 60s 2× earnings boost
+- **Remove Ads** purchase (banner + rewarded ads disabled)
+- **Offline PWA** — play in browser or install to home screen
+
+## How to Update (edit once, deploy anywhere)
+
+`www/index.html` is the **single source of truth**. The live site is served directly from `www/` by GitHub Actions — there is nothing else to keep in sync.
+
+**Update the website:**
+```bash
+# 1. Edit www/index.html
+# 2. Commit and push — GitHub Actions auto-deploys to GitHub Pages
+git add ai-empire/www/index.html
+git commit -m "Update AI Empire"
+git push origin main
+```
+
+**Update the mobile app (Android / iOS):**
+```bash
+npx cap sync               # copies www/ into ios/ and android/
+npx cap open android       # or: npx cap open ios
+# rebuild from Android Studio / Xcode
+```
+
+> `docs/` is an unused copy from an earlier setup and is safe to delete — deployment reads `www/`, not `docs/`.
+
+## Monetization Setup (AdMob + Remove Ads)
+
+- **Ad unit IDs** live in one place: the `AD_UNITS` constant at the top of the AD INTEGRATION section in `www/index.html`. Replace the test IDs there with your real ones.
+- **AdMob app IDs** live in `capacitor.config.json` (`admobIOSAppId` / `admobAndroidAppId`). Replace with your real app IDs.
+- **Remove Ads** is currently a demo purchase. Wire a real IAP plugin (e.g. `@capacitor-community/purchases` or `cordova-plugin-purchase`) inside `purchaseRemoveAds()` in `index.html` before shipping.
+
+## Build as Mobile App (Capacitor)
 
 ### Prerequisites
-
 - Node.js 18+
-- Xcode (for iOS) — macOS only
-- Android Studio (for Android)
-- CocoaPods (for iOS): `sudo gem install cocoapods`
+- Xcode (iOS) — macOS only
+- Android Studio (Android)
+- CocoaPods (iOS): `sudo gem install cocoapods`
 
 ### Steps
-
 ```bash
-# 1. Install deps
 npm install
-
-# 2. Sync Capacitor (copies web assets to native platforms)
 npx cap sync
-
-# 3. Open in native IDE
-npx cap open ios    # or
-npx cap open android
-
-# 4. Build & run from Xcode / Android Studio
+npx cap open ios      # or: npx cap open android
+# build & run from Xcode / Android Studio
 ```
-
-### AdMob
-
-Test ad units are already configured. Before publishing:
-
-1. Create AdMob accounts for iOS and Android
-2. Replace `admobIOSAppId` and `admobAndroidAppId` in `capacitor.config.json`
-3. Update banner and rewarded video ad unit IDs in the AdMob dashboard
-
-### Building for Production
-
-```bash
-# iOS
-npx cap sync ios
-# Open ios/ in Xcode, select Generic iOS Device, Product > Archive
-
-# Android
-npx cap sync android
-# Open android/ in Android Studio, Build > Generate Signed Bundle / APK
-```
-
-## Game Overview
-
-- **Click** the GPU/Server/AI core to earn Compute
-- **Buy upgrades** (16 total across 4 stages) to boost earnings
-- **Unlock stages**: Garage → Office → Datacenter → Cloud
-- **Prestige**: "Train Foundation Model" to earn AI Progress points (permanent multiplier)
-- **Offline earnings**: Compute accumulates while away (up to 8 hours)
-- **Ads**: Banner (bottom) + Rewarded video (2x boost / compute pack)
 
 ## File Structure
-
 ```
 ai-empire/
-├── www/                  # Web assets
-│   └── index.html        # Complete game (self-contained)
+├── www/                  # ← the game (single source of truth)
+│   └── index.html        # complete self-contained game
 ├── ios/                  # Xcode project (Capacitor)
 ├── android/              # Android Studio project (Capacitor)
-├── capacitor.config.json # Capacitor configuration
-├── package.json          # Dependencies
+├── capacitor.config.json # Capacitor + AdMob app IDs
+├── package.json
 └── README.md
 ```

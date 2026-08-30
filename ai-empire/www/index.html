@@ -52,6 +52,7 @@ const LANG = {
     getReady:'准备迎战!', waveComplete:'波次完成 +',
     gameOver:'游戏结束', aiLost:'AI 失控了... 杀了', enemies:'个敌人',
     retry:'重试', menu:'菜单', adRevive:'📺 看广告复活',
+    adDouble:'📺 看广告双倍奖励', boost:'收益×2', removeAds:'🚫 移除广告', removeAdsDone:'✓ 广告已移除',
     levelComplete:'关卡完成!', livesLeft:'剩余生命:', kills2:'击杀:',
     gold:'金币:', totalStars:'总星数:', cont:'继续',
     tutorial:[
@@ -63,8 +64,8 @@ const LANG = {
     ],
     tapToCont:'点击继续 ▸',
     heroName:['皮衣教主','火箭侠','奥特曼'],
-    heroActive:['CUDA 风暴','超回路','世界币空投'],
-    heroPassive:['张量核心：附近炮塔攻速+20%','规模经济：升级费用-15%','AGI 初始化：新炮塔初始Lv.1'],
+    heroActive:['皮衣风暴','火箭冲刺','神谕空投'],
+    heroPassive:['教主光环：附近炮塔攻速+20%','规模经济：升级费用-15%','AGI 初始化：新炮塔初始Lv.1'],
     heroSelectTitle:'选择英雄', heroOwned:'已拥有', heroBuy:'购买', heroEquip:'装备', heroSelected:'已装备',
     eBug:'Bug', eVirus:'病毒', eBadModel:'坏模型', eReg:'监管', eBoss:'AGI Boss',
     maxLv:'MAX', level:'Lv.', lvComplete:'关卡完成!',
@@ -74,7 +75,7 @@ const LANG = {
   en: {
     title:'AI Empire TD', subtitle:'Tower Defense',
     start:'Start Game', footer:'Doodle Style · Place Towers · Stop AI',
-    heroes:'👆 Jensen Huang · Elon Musk · Sam Altman',
+    heroes:'👆 Jacket King · Rocket Bro · The Oracle',
     selectLevel:'Select Level', back:'← Back', star:'⭐', locked:'🔒',
     mapG:'Silicon Garage', mapF:'Shenzhen Factory', mapC:'Cloud Battle',
     mapGF:'🗺️ Silicon Garage', mapFF:'🗺️ Shenzhen Factory (5⭐)', mapCF:'🗺️ Cloud Battle (15⭐)',
@@ -86,6 +87,7 @@ const LANG = {
     getReady:'Get Ready!', waveComplete:'Wave Complete +',
     gameOver:'GAME OVER', aiLost:'AI lost control... killed', enemies:'enemies',
     retry:'Retry', menu:'Menu', adRevive:'📺 Watch Ad to Revive',
+    adDouble:'📺 Watch Ad to Double', boost:'Earn 2x', removeAds:'🚫 Remove Ads', removeAdsDone:'✓ Ads Removed',
     levelComplete:'Level Complete!', livesLeft:'Lives:', kills2:'Kills:',
     gold:'Gold:', totalStars:'Total Stars:', cont:'Continue',
     tutorial:[
@@ -96,9 +98,9 @@ const LANG = {
       'Between waves, tap towers to upgrade or sell.\nPrepare for the Boss!',
     ],
     tapToCont:'Tap to continue ▸',
-    heroName:['Jensen Huang','Elon Musk','Sam Altman'],
-    heroActive:['CUDA Storm','Hyperloop','Worldcoin Drop'],
-    heroPassive:['Tensor Core: +20% fire rate for nearby towers','Economy of Scale: -15% upgrade cost','AGI Init: New towers start at Lv.1'],
+    heroName:['Jacket King','Rocket Bro','The Oracle'],
+    heroActive:['Jacket Storm','Rocket Rush','Oracle Drop'],
+    heroPassive:['Jacket Aura: +20% fire rate for nearby towers','Economy of Scale: -15% upgrade cost','AGI Init: New towers start at Lv.1'],
     heroSelectTitle:'Select Hero', heroOwned:'Owned', heroBuy:'Buy', heroEquip:'Equip', heroSelected:'Equipped',
     eBug:'Bug', eVirus:'Virus', eBadModel:'Bad Model', eReg:'Regulation', eBoss:'AGI Boss',
     maxLv:'MAX', level:'Lv.', lvComplete:'Level Complete!',
@@ -152,6 +154,7 @@ const defaultSave = {
   lang: 'zh',
   ownedHeroes: ['jensen'],
   activeHero: 'jensen',
+  removeAds: false,
 };
 let saveData = { ...defaultSave };
 
@@ -522,6 +525,8 @@ function resetGame(levelIdx) {
     _tooltipIdx: -1,
     _hyperloopTimer: 0,
     _hyperloopActive: false,
+    _boostTimer: 0,
+    _carryBonus: 0,
     _screenFlash: 0,
   };
   if (G.tutorial) G.tutorialStep = 0;
@@ -659,7 +664,7 @@ function updateTower(t, dt) {
     t.incomeTimer += dt;
     if (t.incomeTimer >= 1) {
       t.incomeTimer -= 1;
-      G.money += t.income;
+      G.money += t.income * boostMult();
       G.moneyTexts.push({ x:t.x, y:t.y-20, text:'+'+t.income, life:1, maxLife:1 });
     }
   }
@@ -753,7 +758,7 @@ function dealDamage(e, dmg) {
   G.moneyTexts.push({ x:e.x, y:e.y-10, text:'-'+dmg, life:0.6, maxLife:0.6, color:'#E53935' });
   if (e.hp <= 0) {
     e.alive = false;
-    G.money += e.reward;
+    G.money += e.reward * boostMult();
     G.totalKills++;
     spawnKillParticles(e.x, e.y, e.color, e.reward);
   }
@@ -950,6 +955,11 @@ function updateWave(dt) {
     G._hyperloopTimer -= dt;
     if (G._hyperloopTimer <= 0) { G._hyperloopTimer = 0; G._hyperloopActive = false; }
   }
+  // Boost timer
+  if (G._boostTimer) {
+    G._boostTimer -= dt;
+    if (G._boostTimer <= 0) G._boostTimer = 0;
+  }
 
   // Screen flash decay
   if (G._screenFlash) {
@@ -974,7 +984,7 @@ function updateWave(dt) {
   if (G.waveState !== 'idle' && G.enemies.filter(e=>e.alive).length === 0 && G.spawnQueue.length === 0) {
     // Wave complete
     const bonus = 20 + G.levelIdx * 15 + G.waveIdx * 10;
-    G.money += bonus;
+    G.money += bonus * boostMult();
     G.moneyTexts.push({ x:GW/2, y:200, text:T('waveComplete')+bonus, life:1.5, maxLife:1.5 });
     G.waveIdx++;
     G.waveState = 'idle';
@@ -997,7 +1007,13 @@ function levelComplete() {
   // Carry over 20% of level earnings to persistent wallet
   const startMoney = LEVELS[idx].money;
   const earned = G.money - startMoney;
-  if (earned > 0) saveData.money += Math.floor(earned * 0.2);
+  if (earned > 0) {
+    const carry = Math.floor(earned * 0.2);
+    saveData.money += carry;
+    G._carryBonus = carry; // extra available via rewarded ad
+  } else {
+    G._carryBonus = 0;
+  }
   saveGame();
   setState('LEVEL_COMPLETE');
 }
@@ -1109,6 +1125,11 @@ function menuTap(pos) {
       pos.y >= _langBtn.y && pos.y <= _langBtn.y+_langBtn.h) {
     toggleLang();
   }
+  // Remove ads
+  const rax = GW/2-80, ray = GH/2+135, raw = 160, rah = 32;
+  if (pos.x >= rax && pos.x <= rax+raw && pos.y >= ray && pos.y <= ray+rah) {
+    purchaseRemoveAds();
+  }
 }
 
 // ==================== LEVEL SELECT ====================
@@ -1203,6 +1224,12 @@ function handleGameTap(pos) {
     const speedX = 380;
     if (pos.x >= speedX && pos.x <= speedX+60 && pos.y >= shopY && pos.y <= GH) {
       G.speed = G.speed > 1 ? 1 : 2;
+      return;
+    }
+    // 2x earnings boost (rewarded ad)
+    const boostX = 450;
+    if (pos.x >= boostX && pos.x <= boostX+60 && pos.y >= shopY && pos.y <= GH) {
+      adBoost();
       return;
     }
     // Hero button (last)
@@ -1341,6 +1368,14 @@ function gameOverTap(pos) {
 }
 
 function levelCompleteTap(pos) {
+  // Double reward (watch ad)
+  if (G._carryBonus && G._carryBonus > 0) {
+    const ax = GW/2-95, ay = GH/2+130, aw = 190, ah = 36;
+    if (pos.x >= ax && pos.x <= ax+aw && pos.y >= ay && pos.y <= ay+ah) {
+      adDoubleCarry();
+      return;
+    }
+  }
   const mx = GW/2-50, my = GH/2+60;
   if (pos.x >= mx && pos.x <= mx+100 && pos.y >= my && pos.y <= my+40) {
     setState('LEVEL_SELECT');
@@ -1439,6 +1474,13 @@ function renderMenu() {
   ctx.font = '14px sans-serif';
   ctx.fillText(lang === 'zh' ? T('langEn') : T('langZh'), GW/2, ly + 24);
   _langBtn = { x:lx, y:ly, w:lw, h:lh };
+
+  // Remove ads
+  const rax = GW/2-80, ray = GH/2+135, raw = 160, rah = 32;
+  dRoundRect(rax, ray, raw, rah, 8, saveData.removeAds ? '#4CAF50' : '#FFD600', null);
+  ctx.fillStyle = saveData.removeAds ? '#fff' : '#2d2d2d';
+  ctx.font = '13px sans-serif';
+  ctx.fillText(saveData.removeAds ? T('removeAdsDone') : T('removeAds'), GW/2, ray+21);
 
   // Footer
   ctx.fillStyle = '#aaa';
@@ -1799,6 +1841,16 @@ function renderGame() {
   ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center';
   ctx.fillText(is2x ? '2x' : '1x', speedX+30, shopY+32);
 
+  // 2x earnings boost button (rewarded ad)
+  const boostX = 450;
+  const boosting = G._boostTimer && G._boostTimer > 0;
+  dRoundRect(boostX, shopY+5, 60, 45, 6, boosting ? '#FFD600' : '#333', '#555');
+  ctx.fillStyle = boosting ? '#2d2d2d' : '#888';
+  ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('📺 2×', boostX+30, shopY+22);
+  ctx.font = '8px sans-serif';
+  ctx.fillText(boosting ? Math.ceil(G._boostTimer)+'s' : T('boost'), boostX+30, shopY+42);
+
   // Hero ability button
   const hx = GW - 70;
   const heroReady = G.hero && G.hero.specialReady;
@@ -1848,7 +1900,7 @@ function renderGame() {
   if (G._hyperloopTimer && G._hyperloopTimer > 0) {
     ctx.fillStyle = '#FF6D00';
     ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('⚡ HYPERLOOP '+G._hyperloopTimer.toFixed(1)+'s', GW/2, GH/2-55);
+    ctx.fillText('⚡ '+T('heroActive')[1]+' '+G._hyperloopTimer.toFixed(1)+'s', GW/2, GH/2-55);
   }
 
   // ========== BETWEEN WAVES: Start button ==========
@@ -2024,6 +2076,13 @@ function renderLevelComplete() {
   ctx.font = '13px sans-serif';
   ctx.fillText(T('totalStars') + ' ' + (saveData.totalStars + stars), GW/2, GH/2+68);
 
+  // Watch ad to double reward
+  if (G._carryBonus && G._carryBonus > 0) {
+    dRoundRect(GW/2-95, GH/2+130, 190, 36, 8, '#FFD600', null);
+    ctx.fillStyle = '#2d2d2d'; ctx.font = '13px sans-serif';
+    ctx.fillText(T('adDouble') + ' (+' + fmt(G._carryBonus) + ')', GW/2, GH/2+154);
+  }
+
   // Continue
   dRoundRect(GW/2-50, GH/2+80, 100, 40, 8, '#4A90D9', null);
   ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif';
@@ -2134,12 +2193,21 @@ _stateEnter['HERO_SELECT'] = function() {
 // ==================== AD INTEGRATION ====================
 let isNative = typeof window.Capacitor !== 'undefined' && window.Capacitor.isNativePlatform();
 
+// ─── AdMob unit IDs ───────────────────────────────────────────────
+// ⚠️ These are Google TEST IDs. After you create your AdMob account,
+// paste your real ad unit IDs here (from the AdMob dashboard). This is
+// the ONLY place you need to change ad unit IDs.
+const AD_UNITS = {
+  rewarded: 'ca-app-pub-3940256099942544/5224354917', // test rewarded video
+  banner:   'ca-app-pub-3940256099942544/6300978111', // test banner
+};
+
 async function initAdMob() {
-  if (isNative) {
+  if (isNative && !saveData.removeAds) {
     try {
       const { AdMob } = window.Capacitor.Plugins;
       await AdMob.initialize();
-      await AdMob.showBanner({ adSize: 'BANNER', position: 'bottom' });
+      await AdMob.showBanner({ adId: AD_UNITS.banner, adSize: 'BANNER', position: 'bottom' });
       document.getElementById('bannerAd').classList.remove('hidden');
       document.getElementById('bannerAd').classList.add('active');
       document.getElementById('app').classList.add('has-banner');
@@ -2149,23 +2217,68 @@ async function initAdMob() {
   }
 }
 
-// Ad revive in game over
-function adRevive() {
+// 2x earnings multiplier while a boost is active
+function boostMult() { return (G._boostTimer && G._boostTimer > 0) ? 2 : 1; }
+
+// Show a rewarded ad, then call onRewarded() if the player earned it.
+// Paid players (removeAds) and web/PWA players skip straight to the reward.
+function showRewardedAd(onRewarded) {
+  if (saveData.removeAds) { onRewarded(); return; }
   if (isNative) {
     try {
       const { AdMob } = window.Capacitor.Plugins;
-      AdMob.prepareRewardVideoAd().then(() =>
+      AdMob.prepareRewardVideoAd({ adId: AD_UNITS.rewarded }).then(() =>
         AdMob.showRewardVideoAd().then(result => {
-          if (result && result.isRewarded) {
-            G.lives = 10; G.gameOver = false;
-            setState('PLAYING');
-          }
+          if (result && result.isRewarded) onRewarded();
         })
       ).catch(() => {});
     } catch(e) {}
   } else {
+    onRewarded();
+  }
+}
+
+// Rewarded placement 1 — revive on game over
+function adRevive() {
+  showRewardedAd(() => {
     G.lives = 10; G.gameOver = false;
     setState('PLAYING');
+  });
+}
+
+// Rewarded placement 2 — double the level-carryover bonus
+function adDoubleCarry() {
+  if (G._carryBonus && G._carryBonus > 0) {
+    showRewardedAd(() => {
+      saveData.money += G._carryBonus;
+      G._carryBonus = 0;
+      saveGame();
+    });
+  }
+}
+
+// Rewarded placement 3 — 60s of 2x earnings
+function adBoost() {
+  showRewardedAd(() => {
+    G._boostTimer = 60;
+  });
+}
+
+// ─── Remove Ads purchase ─────────────────────────────────────────
+// Real IAP: add a purchase plugin (e.g. @capacitor-community/purchases
+// or cordova-plugin-purchase), call purchase('remove_ads') here, and set
+// saveData.removeAds = true only on a verified receipt. Web demo just confirms.
+function purchaseRemoveAds() {
+  if (saveData.removeAds) return;
+  if (isNative) {
+    // TODO: replace with a real IAP call (see note above).
+  }
+  const ok = (typeof confirm === 'function')
+    ? confirm('Remove all ads for $1.99? (Demo — payment not wired yet)')
+    : true;
+  if (ok) {
+    saveData.removeAds = true;
+    saveGame();
   }
 }
 
