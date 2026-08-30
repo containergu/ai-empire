@@ -1189,7 +1189,7 @@ function levelSelectTap(pos) {
   }
 
   // Back button
-  if (pos.x >= 20 && pos.x <= 100 && pos.y >= 50 && pos.y <= 78) {
+  if (pos.x >= 20 && pos.x <= 80 && pos.y >= 50 && pos.y <= 78) {
     setState('MENU');
   }
 }
@@ -1398,6 +1398,12 @@ function gameOverTap(pos) {
     if (earned > 0) saveData.money += Math.floor(earned * 0.1);
     saveGame();
     setState('LEVEL_SELECT');
+    return;
+  }
+  // Revive (watch ad)
+  const vx = GW/2-80, vy = GH/2+95;
+  if (pos.x >= vx && pos.x <= vx+160 && pos.y >= vy && pos.y <= vy+36) {
+    adRevive();
     return;
   }
 }
@@ -2318,18 +2324,7 @@ function purchaseRemoveAds() {
   }
 }
 
-// Add revive button handler dynamically
-document.addEventListener('click', function(e) {
-  if (state !== 'GAME_OVER') return;
-  const rect = canvas.getBoundingClientRect();
-  const px = (e.clientX - rect.left) / rect.width * canvas.width;
-  const py = (e.clientY - rect.top) / rect.height * canvas.height;
-  const lx = (px - offX) / scaleFactor, ly = (py - offY) / scaleFactor;
-  // Ad revive button
-  if (lx >= GW/2-80 && lx <= GW/2+80 && ly >= GH/2+95 && ly <= GH/2+131) {
-    adRevive();
-  }
-});
+// Revive is handled in gameOverTap() via the canvas tap/click path, so it works on mobile too.
 
 // ==================== INIT ====================
 function init() {
