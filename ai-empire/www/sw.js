@@ -1,29 +1,26 @@
-const CACHE = 'ai-empire-v1';
-const FILES = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
-];
+const CACHE = 'ai-empire-v2';
+// Relative paths resolve against this service worker's location (e.g. /ai-empire/).
+const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
-// Install: cache all files
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())
-  );
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
 });
 
-// Activate: clean old caches
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.map(k => { if (k !== CACHE) return caches.delete(k); })))
+    caches.keys().then(keys => Promise.all(keys.map(k => k !== CACHE ? caches.delete(k) : null)))
+      .then(() => self.clients.claim())
   );
 });
 
-// Fetch: cache-first, fallback to network
+// Network-first: always serve fresh content when online; fall back to cache offline.
 self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
+    fetch(e.request).then(res => {
+      const clone = res.clone();
+      caches.open(CACHE).then(c => c.put(e.request, clone));
+      return res;
+    }).catch(() => caches.match(e.request))
   );
 });
