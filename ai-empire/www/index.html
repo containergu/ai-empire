@@ -17,12 +17,22 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 #bannerAd{position:fixed;bottom:0;left:0;width:100%;height:50px;background:#1a1a2e;color:#666;display:flex;align-items:center;justify-content:center;font-size:11px;z-index:100;border-top:1px solid #333}
 #bannerAd.active{background:#f0ebe3;color:#aaa}
 .hidden{display:none!important}
+#rotateHint{position:fixed;inset:0;background:rgba(26,26,46,0.97);color:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:200;text-align:center;padding:24px;gap:12px;pointer-events:none}
+#rotateHint .icon{font-size:56px}
+#rotateHint .title{font-size:20px;font-weight:bold;letter-spacing:.5px}
+#rotateHint .sub{font-size:14px;color:#aaa}
+@media (orientation:portrait) and (max-width:700px){#rotateHint{display:flex}}
 </style>
 </head>
 <body>
 <div id="app">
   <canvas id="gameCanvas"></canvas>
   <div id="bannerAd" class="hidden">[ AdMob Banner 广告位 ]</div>
+</div>
+<div id="rotateHint">
+  <div class="icon">🔄</div>
+  <div class="title">Rotate your phone · 请旋转手机</div>
+  <div class="sub">This game plays best in landscape · 横屏体验更佳</div>
 </div>
 <script>
 // ========================================================================
@@ -124,8 +134,9 @@ const ctx = canvas.getContext('2d');
 let scaleFactor = 1, offX = 0, offY = 0;
 
 function resizeCanvas() {
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(canvas.clientWidth * dpr);
+  canvas.height = Math.round(canvas.clientHeight * dpr);
   const sx = canvas.width / GW, sy = canvas.height / GH;
   scaleFactor = Math.min(sx, sy);
   offX = (canvas.width - GW * scaleFactor) / 2;
@@ -182,15 +193,39 @@ function fmt(n) {
   return (n/1e6).toFixed(1) + 'M';
 }
 
+// roundRect polyfill for older Safari / Android WebView (prevents blank-screen crash)
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+    if (typeof r === 'number') r = { tl: r, tr: r, br: r, bl: r };
+    this.moveTo(x + r.tl, y);
+    this.lineTo(x + w - r.tr, y);
+    this.quadraticCurveTo(x + w, y, x + w, y + r.tr);
+    this.lineTo(x + w, y + h - r.br);
+    this.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
+    this.lineTo(x + r.bl, y + h);
+    this.quadraticCurveTo(x, y + h, x, y + h - r.bl);
+    this.lineTo(x, y + r.tl);
+    this.quadraticCurveTo(x, y, x + r.tl, y);
+    this.closePath();
+    return this;
+  };
+}
+
 // ==================== DOODLE DRAWING ====================
+// deterministic pseudo-random wobble (stable per coordinate, so doodles don't shimmer)
+function wob(x, y, i) {
+  const n = Math.sin(x * 12.9898 + y * 78.233 + i * 37.719) * 43758.5453;
+  return (n - Math.floor(n)) * 2 - 1;
+}
+
 function dLine(x1,y1,x2,y2,color='#2d2d2d',w=3) {
   ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=w; ctx.lineCap='round';
   const steps = Math.max(4, Math.floor(Math.hypot(x2-x1,y2-y1)/10));
   ctx.beginPath();
   for (let i=0;i<=steps;i++) {
     const t=i/steps;
-    const x=x1+(x2-x1)*t+(i>0&&i<steps?(Math.random()-0.5)*2:0);
-    const y=y1+(y2-y1)*t+(i>0&&i<steps?(Math.random()-0.5)*2:0);
+    const x=x1+(x2-x1)*t+(i>0&&i<steps?wob(x1,y1,i):0);
+    const y=y1+(y2-y1)*t+(i>0&&i<steps?wob(x1,y1,i+0.5):0);
     i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
   }
   ctx.stroke(); ctx.restore();
@@ -210,8 +245,8 @@ function dCircle(cx,cy,r,stroke='#2d2d2d',fill=null) {
   ctx.beginPath();
   for (let i=0;i<=steps;i++) {
     const t=i/steps, a=t*Math.PI*2;
-    const wob=i>0&&i<steps?(Math.random()-0.5)*1.5:0;
-    const x=cx+(r+wob)*Math.cos(a), y=cy+(r+wob)*Math.sin(a);
+    const wobble=i>0&&i<steps?wob(cx,cy,i)*0.75:0;
+    const x=cx+(r+wobble)*Math.cos(a), y=cy+(r+wobble)*Math.sin(a);
     i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
   }
   ctx.closePath(); ctx.stroke(); ctx.restore();
@@ -251,9 +286,9 @@ const MAPS = {
     ],
     spawn:{x:0,y:160}, exit:{x:800,y:160},
     zones:[
-      {x1:2,y1:0,x2:4,y2:3},{x1:6,y1:0,x2:12,y2:3},
+      {x1:2,y1:1,x2:4,y2:3},{x1:6,y1:1,x2:12,y2:3},
       {x1:6,y1:7,x2:12,y2:12},{x1:14,y1:7,x2:17,y2:12},
-      {x1:14,y1:0,x2:17,y2:3},
+      {x1:14,y1:1,x2:17,y2:3},
     ],
     heroSpot:{x:400,y:300},
     obstacles:[], doodle:drawFactoryDoodles,
@@ -616,7 +651,7 @@ function placeTower(type, gridX, gridY) {
     slowAmt: def.slowAmount || 0,
     income: def.income ? def.income[startLv] : 0,
     splashR: def.splashR ? def.splashR[startLv] : 0,
-    totalInvested: cost + (startLv === 1 ? def.cost[1] : 0),
+    totalInvested: cost,
     _aura: false,
   };
   G.towers.push(tower);
@@ -671,7 +706,7 @@ function updateTower(t, dt) {
 
   // Jensen aura: +20% fire rate
   let rateMult = 1;
-  if (t._aura) rateMult *= 0.8;
+  if (t._aura) rateMult *= (1 / 1.2); // +20% fire rate (matches description)
   // Hyperloop: 3x speed
   if (G._hyperloopTimer && G._hyperloopTimer > 0) rateMult *= 0.33;
 
@@ -1154,7 +1189,7 @@ function levelSelectTap(pos) {
   }
 
   // Back button
-  if (pos.x >= 20 && pos.x <= 100 && pos.y >= 20 && pos.y <= 50) {
+  if (pos.x >= 20 && pos.x <= 100 && pos.y >= 50 && pos.y <= 78) {
     setState('MENU');
   }
 }
@@ -1250,7 +1285,7 @@ function handleGameTap(pos) {
   // Tower upgrade/sell panel click (always available)
   if (G.selectedTower) {
     const t = G.selectedTower;
-    const px = t.x + 30, py = t.y - 30;
+    const px = Math.min(t.x + 30, GW - 140), py = t.y - 30;
     // Upgrade button — rendered at (px, py+34, 60, 22)
     if (pos.x >= px && pos.x <= px+60 && pos.y >= py+34 && pos.y <= py+56) {
       if (t.level < 2) upgradeTower(t);
@@ -1376,7 +1411,7 @@ function levelCompleteTap(pos) {
       return;
     }
   }
-  const mx = GW/2-50, my = GH/2+60;
+  const mx = GW/2-50, my = GH/2+80;
   if (pos.x >= mx && pos.x <= mx+100 && pos.y >= my && pos.y <= my+40) {
     setState('LEVEL_SELECT');
   }
@@ -1507,7 +1542,7 @@ function renderLevelSelect() {
   ctx.textAlign = 'right';
   ctx.font = '16px sans-serif';
   ctx.fillStyle = '#e8b830';
-  ctx.fillText(T('stars')+' '+saveData.totalStars, GW-20, 40);
+  ctx.fillText(T('totalStars')+' '+saveData.totalStars, GW-20, 40);
 
   // Back
   ctx.textAlign = 'center';
@@ -1666,7 +1701,7 @@ function renderGame() {
   // Enemies
   for (const e of G.enemies) {
     if (!e.alive) continue;
-    const flash = e.hitFlash > 0 ? '#fff' : e.color;
+    const flash = e.hitFlash > 0 ? '#ffffff' : e.color;
     dCircle(e.x, e.y, e.size, '#2d2d2d', flash + '88');
 
     // Specific enemy doodles
@@ -2074,7 +2109,7 @@ function renderLevelComplete() {
   ctx.fillText(T('gold') + ' ' + fmt(G.money), GW/2, GH/2+44);
   ctx.fillStyle = '#aaa';
   ctx.font = '13px sans-serif';
-  ctx.fillText(T('totalStars') + ' ' + (saveData.totalStars + stars), GW/2, GH/2+68);
+  ctx.fillText(T('totalStars') + ' ' + saveData.totalStars, GW/2, GH/2+68);
 
   // Watch ad to double reward
   if (G._carryBonus && G._carryBonus > 0) {
@@ -2211,6 +2246,7 @@ async function initAdMob() {
       document.getElementById('bannerAd').classList.remove('hidden');
       document.getElementById('bannerAd').classList.add('active');
       document.getElementById('app').classList.add('has-banner');
+      requestAnimationFrame(resizeCanvas); // banner changes the canvas height
     } catch(e) {
       console.log('AdMob not available');
     }
