@@ -356,6 +356,10 @@ function toggleSound() {
   saveGame();
 }
 
+function shake(a) {
+  if (G) G._shake = Math.max(G._shake || 0, a);
+}
+
 // ==================== MAPS ====================
 const MAPS = {
   garage: {
@@ -660,6 +664,7 @@ function resetGame(levelIdx) {
     _boostTimer: 0,
     _carryBonus: 0,
     _screenFlash: 0,
+    _shake: 0,
   };
   if (G.tutorial) G.tutorialStep = 0;
 }
@@ -896,6 +901,7 @@ function dealDamage(e, dmg) {
     G.money += e.reward * boostMult();
     G.totalKills++;
     sfxKill(); sfxCoin();
+    if (e.type === 'agi') shake(16); else if (e.size >= 14) shake(4);
     spawnKillParticles(e.x, e.y, e.color, e.reward);
   }
 }
@@ -1007,6 +1013,7 @@ function heroSpecial() {
   }
 
   G._screenFlash = 0.5;
+  shake(12);
   sfxHero();
   if (G.tutorial && G.tutorialStep === 3) advanceTutorial();
   return true;
@@ -1605,6 +1612,11 @@ function render() {
 
   ctx.save();
   ctx.translate(offX, offY);
+  if (G && G._shake > 0) {
+    ctx.translate((Math.random()-0.5) * G._shake, (Math.random()-0.5) * G._shake);
+    G._shake *= 0.9;
+    if (G._shake < 0.3) G._shake = 0;
+  }
   ctx.scale(scaleFactor, scaleFactor);
 
   // Clip to game area
