@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1.0">
@@ -119,7 +119,7 @@ const LANG = {
     selectHero:'Select Hero',
   },
 };
-let lang = 'zh';
+let lang = (typeof navigator !== 'undefined' && (navigator.language || '').toLowerCase().startsWith('zh')) ? 'zh' : 'en';
 let _langBtn = null;
 function T(key) { return (LANG[lang]&&LANG[lang][key])||key; }
 function toggleLang() {
@@ -170,7 +170,7 @@ const defaultSave = {
   totalStars: 0,
   money: 0,
   tutorialDone: false,
-  lang: 'zh',
+  lang: 'en',
   ownedHeroes: ['jensen'],
   activeHero: 'jensen',
   removeAds: false,
@@ -185,7 +185,7 @@ function saveGame() {
 function loadGame() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
-    if (raw) { saveData = { ...defaultSave, ...JSON.parse(raw) }; lang = saveData.lang || 'zh'; soundOn = saveData.soundOn !== false; return true; }
+    if (raw) { saveData = { ...defaultSave, ...JSON.parse(raw) }; lang = saveData.lang || 'en'; soundOn = saveData.soundOn !== false; return true; }
   } catch(e) {}
   return false;
 }
