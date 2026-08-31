@@ -152,6 +152,7 @@ const _stateEnter = {};
 
 function setState(s) {
   state = s;
+  if (s !== 'PLAYING') paused = false;
   if (_stateEnter[s]) _stateEnter[s]();
 }
 
@@ -1238,6 +1239,15 @@ function heroSelectTap(pos) {
 function handleGameTap(pos) {
   if (G.gameOver || G.completed) return;
 
+  // Pause button (top-right)
+  if (pos.x >= GW-34 && pos.x <= GW-8 && pos.y >= 4 && pos.y <= 30) {
+    paused = !paused;
+    return;
+  }
+
+  // If paused, ignore all other taps
+  if (paused) return;
+
   // Skip tutorial button (top-right)
   if (G.tutorial && pos.x >= GW-70 && pos.x <= GW-10 && pos.y >= 40 && pos.y <= 66) {
     G.tutorial = false;
@@ -1327,13 +1337,9 @@ function handleGameTap(pos) {
     }
   }
 
-  // Hero movement: tap on path cell only
+  // Hero movement: tap anywhere in the play area to move
   if (pos.x >= 0 && pos.x <= GW && pos.y >= 34 && pos.y <= GH - 55) {
-    const gx = Math.floor(pos.x / CELL);
-    const gy = Math.floor(pos.y / CELL);
-    if (G.map.pathCells.has(gx+','+gy)) {
-      G.hero.moveTarget = { x: gx * CELL + CELL/2, y: gy * CELL + CELL/2 };
-    }
+    G.hero.moveTarget = { x: pos.x, y: pos.y };
   }
 }
 
@@ -1866,7 +1872,15 @@ function renderGame() {
 
   // Kills
   ctx.fillStyle = '#888'; ctx.font = '13px sans-serif'; ctx.textAlign = 'right';
-  ctx.fillText(T('kills') + ' ' + G.totalKills, GW-12, 24);
+  ctx.fillText(T('kills') + ' ' + G.totalKills, GW-44, 24);
+
+  // Pause button (top-right) — only during active play
+  if (!G.gameOver && !G.completed) {
+    ctx.textAlign = 'center';
+    dRoundRect(GW-34, 4, 26, 26, 5, paused ? '#4A90D9' : '#555', null);
+    ctx.fillStyle = '#fff'; ctx.font = '14px sans-serif';
+    ctx.fillText(paused ? '▶' : '⏸', GW-21, 23);
+  }
 
   // ========== BOTTOM BAR (Shop) ==========
   const shopY = GH - 55;
@@ -2080,6 +2094,16 @@ function renderGame() {
     ctx.fillText(lang === 'zh' ? '跳过' : 'Skip', GW-40, 57);
   }
 
+  // ========== PAUSED OVERLAY ==========
+  if (paused) {
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    ctx.fillRect(0, 0, GW, GH);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 32px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('⏸ ' + (lang === 'zh' ? '已暂停' : 'Paused'), GW/2, GH/2);
+  }
+
   // ========== END OF GAME RENDER ==========
 }
 
@@ -2219,6 +2243,7 @@ function renderHeroSelect() {
 }
 
 // ==================== GAME LOOP ====================
+let paused = false;
 let _lastTime = 0;
 function gameLoop(timestamp) {
   const rawDt = Math.min(33, (timestamp - _lastTime) / 1000);
@@ -2226,7 +2251,7 @@ function gameLoop(timestamp) {
 
   const dt = rawDt * (G.speed || 1);
 
-  if (state === 'PLAYING' && !G.gameOver && !G.completed) {
+  if (state === 'PLAYING' && !G.gameOver && !G.completed && !paused) {
     updateWave(dt);
 
     // Check game over
