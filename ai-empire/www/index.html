@@ -2022,13 +2022,14 @@ function renderGame() {
     ctx.font = '10px sans-serif'; ctx.fillStyle = '#666';
     ctx.fillText(T('dmg')+t.dmg+' '+T('rng')+t.range, px+6, py+30);
 
-    // Upgrade button
+    // Upgrade button — always visible so players know it exists
     const upgCost = getUpgradeCost(t);
-    if (t.level < 2 && G.money >= upgCost) {
-      dRoundRect(px, py+34, 60, 22, 4, '#4A90D9', null);
-      ctx.fillStyle = '#fff'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+    if (t.level < 2) {
+      const affordable = G.money >= upgCost;
+      dRoundRect(px, py+34, 60, 22, 4, affordable ? '#4A90D9' : '#777', null);
+      ctx.fillStyle = affordable ? '#fff' : '#bbb'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
       ctx.fillText('⬆ ' + fmt(upgCost), px+30, py+50);
-    } else if (t.level >= 2) {
+    } else {
       ctx.fillStyle = '#999'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
       ctx.fillText(T('maxLv'), px+30, py+50);
     }
