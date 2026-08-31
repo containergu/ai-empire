@@ -394,7 +394,7 @@ const HERO_TYPES = [
 // ==================== LEVELS ====================
 const LEVELS = [
   // Map 1: Garage — 5 levels
-  { map:'garage', money:100, tutorial:true, starReq:[17,12,5],
+  { map:'garage', money:220, tutorial:true, starReq:[17,12,5],
     waves:[
       [{t:'bug',c:5,i:1.2}],
       [{t:'bug',c:8,i:1.0},{t:'badModel',c:1,i:2.0}],
@@ -2079,13 +2079,13 @@ function renderGame() {
     }
 
     // Speech bubble
-    const bubbleW = 320, bubbleH = 80;
+    const bubbleW = 440, bubbleH = 84;
     const bx2 = GW/2 - bubbleW/2, by2 = 80;
     dRoundRect(bx2, by2, bubbleW, bubbleH, 10, '#fff', '#2d2d2d');
 
     const stepText = getTutorialSteps()[G.tutorialStep];
     ctx.fillStyle = '#2d2d2d';
-    ctx.font = '14px sans-serif';
+    ctx.font = '13px sans-serif';
     ctx.textAlign = 'center';
     const lines = stepText.split('\n');
     const lh = 20;
