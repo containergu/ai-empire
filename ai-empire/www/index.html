@@ -1194,6 +1194,11 @@ function menuTap(pos) {
   if (pos.x >= rpx && pos.x <= rpx+rpw && pos.y >= rpy && pos.y <= rpy+rph) {
     resetProgress();
   }
+  // Privacy policy link
+  const ppx = GW/2-70, ppy = GH/2+210, ppw = 140, pph = 22;
+  if (pos.x >= ppx && pos.x <= ppx+ppw && pos.y >= ppy && pos.y <= ppy+pph) {
+    try { window.open('https://containergu.github.io/ai-empire/privacy.html', '_blank'); } catch(e) {}
+  }
 }
 
 // ==================== LEVEL SELECT ====================
@@ -1572,6 +1577,13 @@ function renderMenu() {
   ctx.fillStyle = '#fff';
   ctx.font = '12px sans-serif';
   ctx.fillText(lang === 'zh' ? '↺ 重置进度' : '↺ Reset Progress', GW/2, rpy+19);
+
+  // Privacy policy link
+  const ppx = GW/2-70, ppy = GH/2+210, ppw = 140, pph = 22;
+  dRoundRect(ppx, ppy, ppw, pph, 6, '#555', null);
+  ctx.fillStyle = '#ccc';
+  ctx.font = '11px sans-serif';
+  ctx.fillText(lang === 'zh' ? '隐私政策 · Privacy' : 'Privacy Policy', GW/2, ppy+15);
 
   // Footer
   ctx.fillStyle = '#aaa';
