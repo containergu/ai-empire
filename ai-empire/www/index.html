@@ -56,7 +56,7 @@ const LANG = {
     mapGF:'🗺️ 硅谷车库', mapFF:'🗺️ 深圳工厂 (5⭐解锁)', mapCF:'🗺️ 云端之战 (15⭐解锁)',
     lives:'❤️', money:'💰', wave:'🌊', kills:'💀',
     tNames:['GPU 炮塔','防火墙','数据矿机','神经网络','Transformer'],
-    tDescs:['基础防御','减速敌人','备战产出金钱','范围伤害','超远距离打击'],
+    tDescs:['基础防御','减速敌人','波次中产出金钱','范围伤害','超远距离打击'],
     dmg:'伤害:', rng:'范围:', sell:'💰', rate:'攻速:', effect:'效果:', cost:'费用:',
     ability:'技能', startWave:'开始波次 ▶', nextWave:'下一波 ▶',
     getReady:'准备迎战!', waveComplete:'波次完成 +',
@@ -91,7 +91,7 @@ const LANG = {
     mapGF:'🗺️ Silicon Garage', mapFF:'🗺️ Shenzhen Factory (5⭐)', mapCF:'🗺️ Cloud Battle (15⭐)',
     lives:'❤️', money:'💰', wave:'🌊', kills:'💀',
     tNames:['GPU Tower','Firewall','Data Miner','Neural Net','Transformer'],
-    tDescs:['Basic defense','Slows enemies','Generates gold','Splash damage','Long range'],
+    tDescs:['Basic defense','Slows enemies','Gold during waves','Splash damage','Long range'],
     dmg:'DMG:', rng:'RNG:', sell:'💰', rate:'Rate:', effect:'Effect:', cost:'Cost:',
     ability:'Ability', startWave:'Start Wave ▶', nextWave:'Next Wave ▶',
     getReady:'Get Ready!', waveComplete:'Wave Complete +',
@@ -180,6 +180,18 @@ function loadGame() {
     if (raw) { saveData = { ...defaultSave, ...JSON.parse(raw) }; lang = saveData.lang || 'zh'; return true; }
   } catch(e) {}
   return false;
+}
+
+function resetProgress() {
+  const ok = (typeof confirm === 'function')
+    ? confirm(lang === 'zh' ? '重置所有进度？此操作不可撤销。' : 'Reset all progress? This cannot be undone.')
+    : true;
+  if (ok) {
+    const keepLang = saveData.lang || 'zh';
+    saveData = { ...defaultSave, lang: keepLang };
+    saveGame();
+    setState('MENU');
+  }
 }
 
 // ==================== UTILITY ====================
@@ -508,7 +520,7 @@ const LEVELS = [
 
 // Unlock requirements: each map after garage needs stars
 function isLevelUnlocked(idx) {
-  return idx===0||idx===5||idx===10?saveData.unlocked[idx]||saveData.totalStars>=(idx===5?5:15):saveData.unlocked[idx]||saveData.unlocked[idx-1];
+  return idx===0||idx===5||idx===10?saveData.unlocked[idx]||saveData.totalStars>=(idx===5?5:15):saveData.unlocked[idx];
 }
 
 // ==================== GAME STATE RESET ====================
@@ -1170,6 +1182,11 @@ function menuTap(pos) {
   if (pos.x >= rax && pos.x <= rax+raw && pos.y >= ray && pos.y <= ray+rah) {
     purchaseRemoveAds();
   }
+  // Reset progress
+  const rpx = GW/2-80, rpy = GH/2+175, rpw = 160, rph = 28;
+  if (pos.x >= rpx && pos.x <= rpx+rpw && pos.y >= rpy && pos.y <= rpy+rph) {
+    resetProgress();
+  }
 }
 
 // ==================== LEVEL SELECT ====================
@@ -1446,7 +1463,7 @@ function levelCompleteTap(pos) {
 function drawGarageDoodles() {
   // Window
   dRect(550, 40, 100, 80, '#2d2d2d', '#1a1a2e');
-  for (let i=0;i<4;i++) { ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(570+Math.random()*60,50+Math.random()*50,1.5,0,Math.PI*2); ctx.fill(); }
+  for (let i=0;i<4;i++) { ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(600+wob(550,40,i)*30,75+wob(550,40,i+0.7)*25,1.5,0,Math.PI*2); ctx.fill(); }
   // Sticky notes
   dRect(40,60,60,50,'#2d2d2d','#f5e6a0');
   ctx.fillStyle='#2d2d2d'; ctx.font='16px sans-serif'; ctx.textAlign='center';
@@ -1540,6 +1557,13 @@ function renderMenu() {
   ctx.fillStyle = saveData.removeAds ? '#fff' : '#2d2d2d';
   ctx.font = '13px sans-serif';
   ctx.fillText(saveData.removeAds ? T('removeAdsDone') : T('removeAds'), GW/2, ray+21);
+
+  // Reset progress
+  const rpx = GW/2-80, rpy = GH/2+175, rpw = 160, rph = 28;
+  dRoundRect(rpx, rpy, rpw, rph, 8, '#666', null);
+  ctx.fillStyle = '#fff';
+  ctx.font = '12px sans-serif';
+  ctx.fillText(lang === 'zh' ? '↺ 重置进度' : '↺ Reset Progress', GW/2, rpy+19);
 
   // Footer
   ctx.fillStyle = '#aaa';
@@ -2028,34 +2052,23 @@ function renderGame() {
 
     // Highlight area for steps 0-1 (placement zones)
     if (G.tutorialStep <= 1) {
-      ctx.save();
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.fillStyle = 'rgba(0,0,0,1)';
-      // Highlight a valid zone
       const zp = G.map.zones[0];
-      ctx.fillRect(zp.x1*CELL, zp.y1*CELL, (zp.x2-zp.x1+1)*CELL, (zp.y2-zp.y1+1)*CELL);
-      ctx.restore();
-
+      const zx = zp.x1*CELL, zy = zp.y1*CELL, zw = (zp.x2-zp.x1+1)*CELL, zh = (zp.y2-zp.y1+1)*CELL;
+      // Bright highlight fill
+      ctx.fillStyle = 'rgba(255,255,255,0.28)';
+      ctx.fillRect(zx, zy, zw, zh);
       // Pulsing border
-      ctx.save();
-      ctx.globalCompositeOperation = 'source-over';
       const pulse = 0.5 + 0.3 * Math.sin(G.gameTime * 4);
       ctx.strokeStyle = `rgba(74,144,217,${pulse})`;
       ctx.lineWidth = 3; ctx.setLineDash([6,4]);
-      ctx.strokeRect(zp.x1*CELL, zp.y1*CELL, (zp.x2-zp.x1+1)*CELL, (zp.y2-zp.y1+1)*CELL);
+      ctx.strokeRect(zx, zy, zw, zh);
       ctx.setLineDash([]);
-      ctx.restore();
     }
 
     // Highlight hero button for step 3
     if (G.tutorialStep === 3) {
-      ctx.save();
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.fillStyle = 'rgba(0,0,0,1)';
-      dRoundRect(hx, shopY+5, 60, 45, 6, '#000', null);
-      ctx.fillStyle = '#000';
+      ctx.fillStyle = 'rgba(255,255,255,0.28)';
       ctx.fillRect(hx, shopY+5, 60, 45);
-      ctx.restore();
 
       const pulse2 = 0.5 + 0.3 * Math.sin(G.gameTime * 4);
       ctx.save();
@@ -2102,6 +2115,12 @@ function renderGame() {
     ctx.font = 'bold 32px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('⏸ ' + (lang === 'zh' ? '已暂停' : 'Paused'), GW/2, GH/2);
+
+    // Re-draw the pause button on top of the overlay so it stays visible
+    dRoundRect(GW-34, 4, 26, 26, 5, '#4A90D9', null);
+    ctx.fillStyle = '#fff';
+    ctx.font = '14px sans-serif';
+    ctx.fillText('▶', GW-21, 23);
   }
 
   // ========== END OF GAME RENDER ==========
@@ -2254,8 +2273,8 @@ function gameLoop(timestamp) {
   if (state === 'PLAYING' && !G.gameOver && !G.completed && !paused) {
     updateWave(dt);
 
-    // Check game over
-    if (G.lives <= 0) {
+    // Check game over (skip if the level just completed)
+    if (!G.completed && G.lives <= 0) {
       G.gameOver = true;
       setState('GAME_OVER');
     }
