@@ -859,7 +859,11 @@ function updateHero(dt) {
 
 function heroSpecial() {
   const h = G.hero;
-  if (!h.specialReady || G.heroAbilityLocked) return false;
+  if (!h.specialReady || G.heroAbilityLocked) {
+    // During tutorial step 3, tapping the ability advances even if it's on cooldown
+    if (G.tutorial && G.tutorialStep === 3) advanceTutorial();
+    return false;
+  }
   const def = getHeroDef(h.type);
   h.specialReady = false;
   h.activeCD = def.activeCD;
