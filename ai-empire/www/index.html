@@ -1337,17 +1337,17 @@ function handleGameTap(pos) {
     }
   }
 
-  // Between waves: tap existing tower to select
-  if (G.waveState === 'idle' || G.waveComplete) {
-    for (const t of G.towers) {
-      if (dist(pos.x, pos.y, t.x, t.y) < 25) {
-        G.selectedTower = G.selectedTower === t ? null : t;
-        return;
-      }
+  // Tap a tower to select it (works during waves too)
+  for (const t of G.towers) {
+    if (dist(pos.x, pos.y, t.x, t.y) < 25) {
+      G.selectedTower = G.selectedTower === t ? null : t;
+      return;
     }
-    G.selectedTower = null;
+  }
+  G.selectedTower = null;
 
-    // Start wave button
+  // Between waves: start wave button
+  if (G.waveState === 'idle' || G.waveComplete) {
     if (pos.x >= GW/2-60 && pos.x <= GW/2+60 && pos.y >= GH/2-20 && pos.y <= GH/2+20) {
       startWave();
       return;
