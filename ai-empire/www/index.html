@@ -1234,6 +1234,14 @@ function heroSelectTap(pos) {
 function handleGameTap(pos) {
   if (G.gameOver || G.completed) return;
 
+  // Skip tutorial button (top-right)
+  if (G.tutorial && pos.x >= GW-70 && pos.x <= GW-10 && pos.y >= 40 && pos.y <= 66) {
+    G.tutorial = false;
+    saveData.tutorialDone = true;
+    saveGame();
+    return;
+  }
+
   // Tutorial: advance on any tap
   if (G.tutorial && state === 'PLAYING') {
     // Steps 2 and 4 are informational — advance on any tap
@@ -1997,7 +2005,7 @@ function renderGame() {
 
   // ========== TUTORIAL ==========
   if (G.tutorial && G.tutorialStep < getTutorialSteps().length) {
-    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    ctx.fillStyle = 'rgba(0,0,0,0.42)';
     ctx.fillRect(0, 0, GW, GH);
 
     // Highlight area for steps 0-1 (placement zones)
@@ -2054,10 +2062,18 @@ function renderGame() {
       ctx.fillText(lines[i], GW/2, by2 + 20 + i * lh);
     }
 
-    // Continue hint
-    ctx.fillStyle = '#aaa';
+    // Continue hint — only on steps that advance on any tap
+    if (G.tutorialStep === 2 || G.tutorialStep === 4) {
+      ctx.fillStyle = '#aaa';
+      ctx.font = '12px sans-serif';
+      ctx.fillText(T('tapToCont'), GW/2, by2 + bubbleH - 8);
+    }
+
+    // Skip tutorial button (top-right)
+    dRoundRect(GW-70, 40, 60, 26, 6, '#888', '#333');
+    ctx.fillStyle = '#fff';
     ctx.font = '12px sans-serif';
-    ctx.fillText(T('tapToCont'), GW/2, by2 + bubbleH - 8);
+    ctx.fillText(lang === 'zh' ? '跳过' : 'Skip', GW-40, 57);
   }
 
   // ========== END OF GAME RENDER ==========
