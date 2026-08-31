@@ -154,6 +154,12 @@ const _stateEnter = {};
 function setState(s) {
   state = s;
   if (s !== 'PLAYING') paused = false;
+  // Manage CrazyGames banner: hide during gameplay, show on menus
+  if (s === 'PLAYING') {
+    clearCrazyGamesBanner();
+  } else if (s === 'MENU' || s === 'LEVEL_SELECT' || s === 'HERO_SELECT') {
+    showCrazyGamesBanner();
+  }
   if (_stateEnter[s]) _stateEnter[s]();
 }
 
@@ -1455,6 +1461,7 @@ function levelCompleteTap(pos) {
   }
   const mx = GW/2-50, my = GH/2+80;
   if (pos.x >= mx && pos.x <= mx+100 && pos.y >= my && pos.y <= my+40) {
+    showInterstitialAd();
     setState('LEVEL_SELECT');
   }
 }
@@ -2405,7 +2412,40 @@ function purchaseRemoveAds() {
 // ==================== INIT ====================
 function initCrazyGames() {
   if (typeof window.CrazyGames !== 'undefined') {
-    try { window.CrazyGames.SDK.init().catch(() => {}); } catch(e) {}
+    try {
+      window.CrazyGames.SDK.init().then(() => showCrazyGamesBanner()).catch(() => {});
+    } catch(e) {}
+  }
+}
+
+function showCrazyGamesBanner() {
+  if (saveData.removeAds) return;
+  if (typeof window.CrazyGames !== 'undefined' && window.CrazyGames.SDK) {
+    try {
+      window.CrazyGames.SDK.banner.requestBanner([
+        { width: 728, height: 90 },
+        { width: 320, height: 50 }
+      ]);
+    } catch(e) {}
+  }
+}
+
+function clearCrazyGamesBanner() {
+  if (typeof window.CrazyGames !== 'undefined' && window.CrazyGames.SDK) {
+    try { window.CrazyGames.SDK.banner.clearBanner(); } catch(e) {}
+  }
+}
+
+function showInterstitialAd() {
+  if (saveData.removeAds) return;
+  if (typeof window.CrazyGames !== 'undefined' && window.CrazyGames.SDK) {
+    try {
+      window.CrazyGames.SDK.ad.requestAd('midgame', {
+        adStarted: () => {},
+        adError: () => {},
+        adFinished: () => {},
+      });
+    } catch(e) {}
   }
 }
 
