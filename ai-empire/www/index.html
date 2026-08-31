@@ -174,6 +174,7 @@ const defaultSave = {
   ownedHeroes: ['jensen'],
   activeHero: 'jensen',
   removeAds: false,
+  soundOn: true,
 };
 let saveData = { ...defaultSave };
 
@@ -184,7 +185,7 @@ function saveGame() {
 function loadGame() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
-    if (raw) { saveData = { ...defaultSave, ...JSON.parse(raw) }; lang = saveData.lang || 'zh'; return true; }
+    if (raw) { saveData = { ...defaultSave, ...JSON.parse(raw) }; lang = saveData.lang || 'zh'; soundOn = saveData.soundOn !== false; return true; }
   } catch(e) {}
   return false;
 }
@@ -277,6 +278,82 @@ function dRoundRect(x,y,w,h,r,fill,stroke) {
   if (fill) { ctx.fillStyle=fill; ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.fill(); }
   if (stroke) { ctx.strokeStyle=stroke; ctx.lineWidth=2; ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.stroke(); }
   ctx.restore();
+}
+
+// ==================== AUDIO ====================
+let audioCtx = null;
+let soundOn = true;
+
+function ensureAudio() {
+  if (!soundOn) return null;
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return null; }
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function tone(freq, dur, type, vol, delay) {
+  const ctx = ensureAudio();
+  if (!ctx) return;
+  const t = ctx.currentTime + (delay || 0);
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.type = type || 'sine';
+  o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(vol || 0.12, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  o.connect(g); g.connect(ctx.destination);
+  o.start(t); o.stop(t + dur);
+}
+
+function noise(dur, vol) {
+  const ctx = ensureAudio();
+  if (!ctx) return;
+  const n = Math.max(1, Math.floor(ctx.sampleRate * dur));
+  const buf = ctx.createBuffer(1, n, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(vol || 0.15, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+  src.connect(g); g.connect(ctx.destination);
+  src.start();
+}
+
+function sfxShoot() { tone(880, 0.07, 'square', 0.04); }
+function sfxHit() { noise(0.05, 0.06); }
+function sfxKill() { tone(220, 0.15, 'sawtooth', 0.1); noise(0.08, 0.08); }
+function sfxCoin() { tone(1200, 0.07, 'sine', 0.08); tone(1600, 0.1, 'sine', 0.06, 0.06); }
+function sfxPlace() { tone(400, 0.08, 'triangle', 0.1); tone(600, 0.1, 'triangle', 0.06, 0.05); }
+function sfxUpgrade() { tone(600, 0.08, 'sine', 0.1); tone(900, 0.1, 'sine', 0.09, 0.07); tone(1200, 0.15, 'sine', 0.08, 0.14); }
+function sfxWaveStart() { tone(180, 0.25, 'sawtooth', 0.1); tone(360, 0.3, 'sawtooth', 0.06, 0.1); }
+function sfxHero() { tone(300, 0.15, 'sawtooth', 0.12); tone(450, 0.2, 'sawtooth', 0.1, 0.08); tone(600, 0.25, 'sawtooth', 0.09, 0.16); }
+function sfxGameOver() { tone(300, 0.3, 'sawtooth', 0.12); tone(200, 0.4, 'sawtooth', 0.12, 0.25); tone(120, 0.6, 'sawtooth', 0.12, 0.55); }
+function sfxVictory() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.25, 'sine', 0.12, i * 0.12)); }
+function sfxClick() { tone(500, 0.05, 'square', 0.05); }
+
+// Background music (soft looping arpeggio)
+let _musicTimer = null;
+let _musicIdx = 0;
+const MUSIC_SEQ = [220, 277, 330, 392, 330, 277];
+function startMusic() {
+  if (_musicTimer) return;
+  _musicTimer = setInterval(() => {
+    if (!soundOn) return;
+    const f = MUSIC_SEQ[_musicIdx % MUSIC_SEQ.length];
+    tone(f, 0.4, 'triangle', 0.03);
+    tone(f * 2, 0.4, 'sine', 0.015);
+    _musicIdx++;
+  }, 450);
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  saveData.soundOn = soundOn;
+  saveGame();
 }
 
 // ==================== MAPS ====================
@@ -676,6 +753,7 @@ function placeTower(type, gridX, gridY) {
   };
   G.towers.push(tower);
   spawnParticles(x, y, '#4A90D9', 6, 15);
+  sfxPlace();
   return true;
 }
 
@@ -701,6 +779,7 @@ function upgradeTower(t) {
   if (def.income) t.income = def.income[t.level];
   if (def.splashR) t.splashR = def.splashR[t.level];
   spawnParticles(t.x, t.y, '#FFD600', 10, 20);
+  sfxUpgrade();
   return true;
 }
 
@@ -766,6 +845,7 @@ function updateTower(t, dt) {
     maxLife: 2,
   };
   G.projectiles.push(proj);
+  sfxShoot();
 }
 
 function updateProjectile(p, dt) {
@@ -815,6 +895,7 @@ function dealDamage(e, dmg) {
     e.alive = false;
     G.money += e.reward * boostMult();
     G.totalKills++;
+    sfxKill(); sfxCoin();
     spawnKillParticles(e.x, e.y, e.color, e.reward);
   }
 }
@@ -926,6 +1007,7 @@ function heroSpecial() {
   }
 
   G._screenFlash = 0.5;
+  sfxHero();
   if (G.tutorial && G.tutorialStep === 3) advanceTutorial();
   return true;
 }
@@ -990,6 +1072,7 @@ function startWave() {
   G.spawnTimer = 0;
   G.waveState = 'spawning';
   G.waveComplete = false;
+  sfxWaveStart();
 }
 
 function updateWave(dt) {
@@ -1074,6 +1157,7 @@ function levelComplete() {
     G._carryBonus = 0;
   }
   saveGame();
+  sfxVictory();
   setState('LEVEL_COMPLETE');
 }
 
@@ -1121,6 +1205,7 @@ function checkShopTooltip(pos) {
 let _touchActive = false;
 canvas.addEventListener('touchstart', e => {
   _touchActive = true; e.preventDefault();
+  startMusic();
   const pos = getLogicalPos(e);
   handleTap(pos);
   checkShopTooltip(pos);
@@ -1183,6 +1268,11 @@ function menuTap(pos) {
   if (_langBtn && pos.x >= _langBtn.x && pos.x <= _langBtn.x+_langBtn.w &&
       pos.y >= _langBtn.y && pos.y <= _langBtn.y+_langBtn.h) {
     toggleLang();
+  }
+  // Sound toggle
+  const sxb = GW/2 - 160, syb = GH/2 + 90;
+  if (pos.x >= sxb && pos.x <= sxb+50 && pos.y >= syb && pos.y <= syb+36) {
+    toggleSound();
   }
   // Remove ads
   const rax = GW/2-80, ray = GH/2+135, raw = 160, rah = 32;
@@ -1563,6 +1653,12 @@ function renderMenu() {
   ctx.font = '14px sans-serif';
   ctx.fillText(lang === 'zh' ? T('langEn') : T('langZh'), GW/2, ly + 24);
   _langBtn = { x:lx, y:ly, w:lw, h:lh };
+
+  // Sound toggle
+  dRoundRect(lx - 60, ly, 50, lh, 8, '#333', '#555');
+  ctx.fillStyle = '#fff';
+  ctx.font = '16px sans-serif';
+  ctx.fillText(soundOn ? '🔊' : '🔇', lx - 35, ly + 24);
 
   // Remove ads
   const rax = GW/2-80, ray = GH/2+135, raw = 160, rah = 32;
@@ -2297,6 +2393,7 @@ function gameLoop(timestamp) {
     // Check game over (skip if the level just completed)
     if (!G.completed && G.lives <= 0) {
       G.gameOver = true;
+      sfxGameOver();
       setState('GAME_OVER');
     }
   }
