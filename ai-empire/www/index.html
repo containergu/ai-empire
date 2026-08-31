@@ -23,6 +23,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 #rotateHint .sub{font-size:14px;color:#aaa}
 @media (orientation:portrait) and (max-width:700px){#rotateHint{display:flex}}
 </style>
+<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
 </head>
 <body>
 <div id="app">
@@ -2331,6 +2332,16 @@ function boostMult() { return (G._boostTimer && G._boostTimer > 0) ? 2 : 1; }
 // Paid players (removeAds) and web/PWA players skip straight to the reward.
 function showRewardedAd(onRewarded) {
   if (saveData.removeAds) { onRewarded(); return; }
+  // CrazyGames web SDK (when hosted on CrazyGames)
+  if (typeof window.CrazyGames !== 'undefined' && window.CrazyGames.SDK) {
+    try {
+      window.CrazyGames.SDK.ad.requestAd('rewarded', {
+        adFinished: () => onRewarded(),
+        adError: () => onRewarded(),
+      });
+      return;
+    } catch(e) { /* fall through to native/web */ }
+  }
   if (isNative) {
     try {
       const { AdMob } = window.Capacitor.Plugins;
@@ -2392,10 +2403,17 @@ function purchaseRemoveAds() {
 // Revive is handled in gameOverTap() via the canvas tap/click path, so it works on mobile too.
 
 // ==================== INIT ====================
+function initCrazyGames() {
+  if (typeof window.CrazyGames !== 'undefined') {
+    try { window.CrazyGames.SDK.init().catch(() => {}); } catch(e) {}
+  }
+}
+
 function init() {
   resizeCanvas();
   loadGame();
   initAdMob();
+  initCrazyGames();
   setState('MENU');
   _lastTime = performance.now();
   requestAnimationFrame(gameLoop);
